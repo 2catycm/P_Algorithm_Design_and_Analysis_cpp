@@ -7,4 +7,5 @@ add_executable(TestClosestPoint cn/edu/SUSTech/YeCanming/Algs/TestClosestPoint.c
 target_link_libraries(TestClosestPoint P_Algorithm_Design_and_Analysis_cpp_closest_point_lib)
 
 add_executable(GTestClosestPoint cn/edu/SUSTech/YeCanming/Algs/GTestClosestPoint.cpp)
+target_link_libraries(GTestClosestPoint P_Algorithm_Design_and_Analysis_cpp_closest_point_lib)
 target_link_libraries(GTestClosestPoint GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)

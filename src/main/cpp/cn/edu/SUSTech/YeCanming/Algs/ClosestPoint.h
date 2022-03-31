@@ -9,7 +9,9 @@ namespace cn::edu::SUSTech::YeCanming::Algs {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs;
     class ClosestPoint {
         template<typename T>
-        std::tuple<std::array<size_t, 2>, T> ClosestPoint2DImpl(const T * cbegin, const T * cend) const;
+        std::tuple<std::array<size_t, 2>, T> ClosestPoint2DImpl(decltype(std::vector<std::array<T, 2>>().cbegin()) cbegin, decltype(std::vector<std::array<T, 2>>().cend()) cend) const;
+//        template<class Iterator, typename T/*typename std::vector<T>::const_iterator*/>
+//        std::tuple<std::array<size_t, 2>, T> ClosestPoint2DImpl(Iterator cbegin, Iterator cend) const;
     public:
         template<typename T>
         std::tuple<int, int> ClosestPoint1D(const std::vector<T> &vec) const;

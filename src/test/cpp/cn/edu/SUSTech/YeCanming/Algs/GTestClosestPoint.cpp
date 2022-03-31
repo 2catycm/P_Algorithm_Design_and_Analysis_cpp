@@ -2,6 +2,7 @@
 // Created by 叶璨铭 on 2022/3/31.
 //
 #include "gtest/gtest.h"
+#include "cn/edu/SUSTech/YeCanming/Algs/ClosestPoint.h"
 namespace cn::edu::SUSTech::YeCanming::Algs{
     class GTestClosestPoint : public ::testing::Test {
     protected:
@@ -28,10 +29,16 @@ namespace cn::edu::SUSTech::YeCanming::Algs{
         }
         // Class members declared here can be used by all tests in the test suite
         // for Foo.
+        ClosestPoint closestPoint;
+        std::vector<std::array<double, 2>> vec2d1 = {{1, 2},{3, 4}, {2.5, 10}, {10, 2.5}};
     };
-    TEST_F(GTestClosestPoint, CanRun){
-        ASSERT_EQ(1, 1);
+    TEST_F(GTestClosestPoint, TestClosestPoint2D){
+        auto [cl, d] = closestPoint.ClosestPoint2D(vec2d1);
+        EXPECT_EQ(d, 2*sqrt(2));
+        EXPECT_EQ(cl[0]+cl[1], 1);
+        EXPECT_EQ(std::max(cl[0],cl[1])-std::min(cl[0],cl[1]), 1);
     }
+
 }
 int main(int argc, char* argv[])
 {
