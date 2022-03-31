@@ -30,18 +30,20 @@ namespace cn::edu::SUSTech::YeCanming::Algs {
         auto leftClosetDist = euclideanDistance(cbegin[leftClosestPoint[0]],
                                                 cbegin[leftClosestPoint[1]]);
         auto rightClosestPoint = ClosestPoint2DImpl(cbegin + mid, cbegin + size);
-        auto rightClosestDist = euclideanDistance(cbegin[rightClosestPoint[0] + mid],
-                                  cbegin[rightClosestPoint[1] + mid]);
-        std::array<int, 2> mergedClosestPoint{}; T lr_min_dist{std::numeric_limits<T>::max()};
+        rightClosestPoint[0]+=mid;
+        rightClosestPoint[1]+=mid; //回到本方法中的下标表示。
+        auto rightClosestDist = euclideanDistance(cbegin[rightClosestPoint[0]],
+                                  cbegin[rightClosestPoint[1]]);
+        std::array<int, 2> mergedClosestPoint{}; T merged_min_dist{std::numeric_limits<T>::max()};
         //准备归并
         if (leftClosetDist<rightClosestDist) {
-                lr_min_dist = leftClosetDist;
-                mergedClosestPoint = leftClosestPoint;
+            merged_min_dist = leftClosetDist;
+            mergedClosestPoint = leftClosestPoint;
         } else {
-            lr_min_dist = rightClosestDist;
+            merged_min_dist = rightClosestDist;
             mergedClosestPoint = rightClosestPoint;
         }
-        T half_lr_min_dist = static_cast<T>(std::ceil(lr_min_dist) / 2);
+        T half_lr_min_dist = static_cast<T>(std::ceil(merged_min_dist) / 2);
         T x_left = cbegin[mid] - half_lr_min_dist;
         T x_right = cbegin[mid] + half_lr_min_dist;
         //开始归并，寻找更近的点对
@@ -53,8 +55,14 @@ namespace cn::edu::SUSTech::YeCanming::Algs {
                 if (!(x_left <= cbegin[j][0] && cbegin[j][0] <= x_right))
                     continue;
                 validJ++;
+                T dist = euclideanDistance(cbegin[i], cbegin[j]);
+                if (dist<merged_min_dist){
+                    merged_min_dist = dist;
+                    mergedClosestPoint = {i, j};
+                }
             }
         }
+        return mergedClosestPoint;
     }
 
     template<typename T>
