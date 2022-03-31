@@ -1,13 +1,12 @@
 //
 // Created by 叶璨铭 on 2022/3/31.
 //
+#include "cn/edu/SUSTech/YeCanming/Algs/ClosestPoint.hpp"
+#include "cn/edu/SUSTech/YeCanming/Judge/JudgeUnit1.hpp"
 #include <algorithm>
-#include <memory>
-#include <random>
 #include <cassert>
 #include <memory>
-#include "cn/edu/SUSTech/YeCanming/Algs/ClosestPoint.h"
-#include "cn/edu/SUSTech/YeCanming/Judge/JudgeUnit1.hpp"
+#include <random>
 using cn::edu::SUSTech::YeCanming::Algs::ClosestPoint;
 std::unique_ptr<ClosestPoint> closestPointPtr;
 BeforeEach

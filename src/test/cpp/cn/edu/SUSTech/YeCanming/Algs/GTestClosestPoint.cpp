@@ -1,8 +1,8 @@
 //
 // Created by 叶璨铭 on 2022/3/31.
 //
+#include "cn/edu/SUSTech/YeCanming/Algs/ClosestPoint.hpp"
 #include "gtest/gtest.h"
-#include "cn/edu/SUSTech/YeCanming/Algs/ClosestPoint.h"
 namespace cn::edu::SUSTech::YeCanming::Algs{
     class GTestClosestPoint : public ::testing::Test {
     protected:
