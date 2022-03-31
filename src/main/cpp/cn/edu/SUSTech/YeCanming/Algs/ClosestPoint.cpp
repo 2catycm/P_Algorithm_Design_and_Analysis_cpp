@@ -10,7 +10,7 @@
 namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs;
 namespace cn::edu::SUSTech::YeCanming::Algs {
     template<typename T>
-    std::array<int, 2> ClosestPoint::ClosestPoint2D(const std::vector<std::array<T, 2>> &vec2d) const {
+    std::tuple<std::array<size_t, 2>, T> ClosestPoint::ClosestPoint2D(const std::vector<std::array<T, 2>> &vec2d) const {
         auto v = vec2d;
         std::sort(std::begin(vec2d), std::end(vec2d), [](std::array<T, 2> a, std::array<T, 2> b) {
             return a[1] == b[1] ? a[0] < b[0] : a[1] < b[1];
@@ -18,7 +18,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs {
         return ClosestPoint2DImpl(v.cbegin(), v.cend());
     }
     template<typename T>
-    std::array<int, 2> ClosestPoint2DImpl(const T *cbegin, const T *cend) {
+    std::tuple<std::array<size_t, 2>, T> ClosestPoint::ClosestPoint2DImpl(const T *cbegin, const T *cend) const {
         //递归基情况
         size_t size = cend - cbegin;
         assert(size >= 2);
@@ -26,18 +26,14 @@ namespace cn::edu::SUSTech::YeCanming::Algs {
             return {0, 1};
         //递归求解左右
         size_t mid = size >> 1;
-        auto leftClosestPoint = ClosestPoint2DImpl(cbegin, cbegin + mid);
-        auto leftClosetDist = euclideanDistance(cbegin[leftClosestPoint[0]],
-                                                cbegin[leftClosestPoint[1]]);
-        auto rightClosestPoint = ClosestPoint2DImpl(cbegin + mid, cbegin + size);
-        rightClosestPoint[0]+=mid;
-        rightClosestPoint[1]+=mid; //回到本方法中的下标表示。
-        auto rightClosestDist = euclideanDistance(cbegin[rightClosestPoint[0]],
-                                  cbegin[rightClosestPoint[1]]);
-        std::array<int, 2> mergedClosestPoint{}; T merged_min_dist{std::numeric_limits<T>::max()};
+        auto [leftClosestPoint, leftClosestDist] = ClosestPoint2DImpl(cbegin, cbegin + mid);
+        auto [rightClosestPoint, rightClosestDist] = ClosestPoint2ClosestPoint2DImpl(cbegin + mid, cbegin + size);
+        std::get<std::array<size_t, 2>>(rightClosestPoint)[0]+=mid;
+        std::get<std::array<size_t, 2>>(rightClosestPoint)[1]+=mid; //下标变换为本层下标
+        std::array<size_t, 2> mergedClosestPoint{}; T merged_min_dist{std::numeric_limits<T>::max()};
         //准备归并
-        if (leftClosetDist<rightClosestDist) {
-            merged_min_dist = leftClosetDist;
+        if (leftClosestDist<rightClosestDist) {
+            merged_min_dist = leftClosestDist;
             mergedClosestPoint = leftClosestPoint;
         } else {
             merged_min_dist = rightClosestDist;
@@ -46,14 +42,13 @@ namespace cn::edu::SUSTech::YeCanming::Algs {
         T half_lr_min_dist = static_cast<T>(std::ceil(merged_min_dist) / 2);
         T x_left = cbegin[mid] - half_lr_min_dist;
         T x_right = cbegin[mid] + half_lr_min_dist;
+#define BoundCheckX(x) if (!(x_left <= (x) && (x) <= x_right)) continue;
         //开始归并，寻找更近的点对
-        for (int i = 0; i < size; ++i) {
-            if (!(x_left <= cbegin[i][0] && cbegin[i][0] <= x_right))
-                continue;
+        for (size_t i = 0; i < size; ++i) {
+            BoundCheckX(cbegin[i][0])
             //如果没有continue掉，就是在中间的，而且按照y顺序排好的一系列点。
-            for (int j = i + 1, validJ = 0; validJ < 6 && j < size; ++j) {
-                if (!(x_left <= cbegin[j][0] && cbegin[j][0] <= x_right))
-                    continue;
+            for (size_t j = i + 1, validJ = 0; validJ < 6 && j < size; ++j) {
+                BoundCheckX(cbegin[j][0])
                 validJ++;
                 T dist = euclideanDistance(cbegin[i], cbegin[j]);
                 if (dist<merged_min_dist){
@@ -62,7 +57,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs {
                 }
             }
         }
-        return mergedClosestPoint;
+        return std::make_tuple(mergedClosestPoint, merged_min_dist);
     }
 
     template<typename T>
@@ -113,6 +108,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs {
         }
         return std::sqrt(sum);
     }
+
 
     template std::tuple<int, int> ClosestPoint::ClosestPoint1D(const std::vector<int> &vec) const;
     template std::tuple<int, int> ClosestPoint::ClosestPoint1D(const std::vector<double> &vec) const;

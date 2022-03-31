@@ -9,12 +9,13 @@ namespace cn::edu::SUSTech::YeCanming::Algs {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs;
     class ClosestPoint {
         template<typename T>
-        std::array<int, 2> ClosestPoint2DImpl(std::vector<std::array<T, 2>> &vec2d);
+        std::tuple<std::array<size_t, 2>, T> ClosestPoint2DImpl(const T * cbegin, const T * cend) const;
     public:
         template<typename T>
         std::tuple<int, int> ClosestPoint1D(const std::vector<T> &vec) const;
         template<typename T>
-        std::array<int, 2> ClosestPoint2D(const std::vector<std::array<T, 2>> &vec2d) const;
+        std::tuple<std::array<size_t, 2>, T> ClosestPoint2D(const std::vector<std::array<T, 2>> &vec2d) const;
+
         template<typename T, size_t N>
         std::array<int, 2> ClosestPointND(const std::vector<std::array<T, N>> &vecnd) const;
 
