@@ -1,5 +1,5 @@
+#include "cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/ClosestPoint.hpp"
 #include <iostream>
-#include "cn/edu/SUSTech/YeCanming/Algs/ClosestPoint.hpp"
 using cn::edu::SUSTech::YeCanming::Algs::ClosestPoint;
 int main() {
     ClosestPoint closestPoint;
