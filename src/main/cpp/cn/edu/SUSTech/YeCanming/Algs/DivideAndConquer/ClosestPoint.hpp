@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "BinarySearch.h"
+#include "BinarySearch.hpp"
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -14,7 +14,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer;
     class ClosestPoint {
     public:
-        template<typename T, typename It=typename std::vector<std::array<T, 2>>::const_iterator>
+        template<typename T, typename It = typename std::vector<std::array<T, 2>>::const_iterator>
         std::tuple<std::array<It, 2>, T> findClosestPointPair2D(const std::vector<std::array<T, 2>> &vec2d) const {
             return findClosestPointPair2D<T>(vec2d.cbegin(), vec2d.cend());
         }
@@ -34,28 +34,37 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
          *      but also sorts the iterators in the order of y.
          *      After getting the answer for sub-problems, it conquers by computing new closest pair and distance,
          *      while also merges the sorted iterators in the order of y.
-         * Known system defects： when the x coordinate of the inputs are the same, it degenerate to O(N^2).
+         * Known system defects：
+         *      1. when the x coordinate of the inputs are the same, it degenerate to O(N^2).
+         *      2. std::inplace_merge may be nlogn
+         *      3. divide should always use mid point but not binary searched point to avoid n=1 problem.
+         *
          */
-        template<typename T, typename It=typename std::vector<std::array<T, 2>>::const_iterator>
+        template<typename T, typename It = typename std::vector<std::array<T, 2>>::const_iterator>
         std::tuple<std::array<It, 2>, T> findClosestPointPair2D(const It first,
-                                                                const It last) const{
+                                                                const It last) const {
             //for example, first-to-last-container is [<3,0>, <1,0>, <2,0>]
             const auto N = std::distance(first, last);
             //for example, size=3
-            std::vector<It> vec2d_its(N); //rather than add an attribute to record the index, we use iterator instead.
+            std::vector<It> vec2d_its(N);//rather than add an attribute to record the index, we use iterator instead.
             auto to = vec2d_its.begin();
-            for (It from = first; from!=last; std::advance(from, 1), std::advance(to, 1)){
+            for (It from = first; from != last; std::advance(from, 1), std::advance(to, 1)) {
                 *to = from;
             }//for example, vec2d_its=[0, 1, 2]. 0,1,2 are pointers or indexes or so-called iterator.
-            std::sort(vec2d_its.begin(), vec2d_its.end(), [](It a, It b){
-                return (*a)[0]<(*b)[0];
+            std::sort(vec2d_its.begin(), vec2d_its.end(), [](It a, It b) {
+                return (*a)[0] < (*b)[0];
             });//for example, vec2d_its=[1, 0, 2]. meaning that first-to-last-container c satisfies c[1].x < c[0].x < c[2].x .
-            return findClosestPointPair2DRecursively<T>(vec2d_its.begin(), vec2d_its.end());
+            std::vector<bool> isLeft(N);
+            std::vector<It> withoutXIllegal(N);
+            return findClosestPointPair2DRecursively<T>(vec2d_its.begin(), vec2d_its.end(), isLeft, first, withoutXIllegal.begin());
         }
+
     private:
         template<typename T, typename It = typename std::vector<std::array<T, 2>>::const_iterator,
-                typename ItIt=typename std::vector<It>::iterator>
-        std::tuple<std::array<It, 2>, T> findClosestPointPair2DRecursively(const ItIt first, const ItIt last) const {
+                 typename ItIt = typename std::vector<It>::iterator>
+        std::tuple<std::array<It, 2>, T> findClosestPointPair2DRecursively(const ItIt first, const ItIt last,
+                                                                           std::vector<bool> &isLeft, const It &firstIt,
+                                                                           ItIt withoutXIllegalFirst) const {
             const auto n = std::distance(first, last);
 #define Point2D(it) (*(it))
 #define X_VALUE(it) (Point2D(it)[0])
@@ -63,22 +72,41 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
             //for example, size=3
             //1.递归基情况
             assert(n >= 2);
-            if (n == 2)
+            if (n == 2) {
+                //先要按照y排好序
+                if (Y_VALUE(first[0])>Y_VALUE(first[1]))
+                    std::swap(first[0], first[1]); //交换了first作为迭代器数组的迭代器的那个数组中，数组第0个元素和第1个元素的值。（0,1是相对于first而言的坐标）
                 return {{first[0], first[1]}, euclideanDistance(Point2D(first[0]), Point2D(first[1]))};
+            }
+            if (n <= 5) {
+                //先要按照y排好序
+                std::sort(first, last, [](It a, It b) {
+                    return Y_VALUE(a) < Y_VALUE(b);
+                });
+                return __findClosestPointPairND<T, 2, typename std::vector<std::array<T, 2>>::const_iterator,
+                                                typename std::vector<It>::iterator>(first, last);
+            }
             //2.递归求解左右
-            const auto midIndex = n >>1;
-            //2.1 趁着现在是x有序的，先把中间的x的值找出来
-            const auto midX = X_VALUE(first[midIndex]);  // <=midX的都是左边，>midX的是右边。
-            //2.1 不要低估这一步的重要性：根据midX重新分配minIndex。 这能把O(n)的情况节省为O(logn)
-            ItIt midIt = ThisPackage::binary_search_for_last_satisfies(first+midIndex, last, [&](It it){
-                return X_VALUE(it)<=midX;
-            })+1; //midIt是右边x的第一个。
+            const auto midIt = first + (n >> 1);//左右的size可以相等或者差1，由于size=3和size=2都特殊处理，不会产生n=1的问题。
+            const auto midX = X_VALUE(*midIt);  //不作为切分左右的依据。这是用来过滤点的。
+                                                //2.1 处理左右问题的标记
+                                                //firstIt是原本的点对数组的首位，每个迭代器It有唯一的序号。
+#define OriginalIndex(it) std::distance(firstIt, (it))
+#define SetLeft(it) isLeft[OriginalIndex(it)] = true
+#define SetRight(it) isLeft[OriginalIndex(it)] = false
+#define GetIsLeft(it) isLeft[OriginalIndex(it)]
+            std::for_each(first, midIt, [&](It it) {
+                SetLeft(it);
+            });
+            std::for_each(midIt, last, [&](It it) {
+                SetRight(it);
+            });
             //2.2 递归求解得到答案，同时左右变成了y有序。
-            auto [leftClosestPair, leftClosestDist] = findClosestPointPair2DRecursively<T>(first, midIt);
-            auto [rightClosestPair, rightClosestDist] = findClosestPointPair2DRecursively<T>(midIt, last);
+            auto [leftClosestPair, leftClosestDist] = findClosestPointPair2DRecursively<T>(first, midIt, isLeft, firstIt, withoutXIllegalFirst);
+            auto [rightClosestPair, rightClosestDist] = findClosestPointPair2DRecursively<T>(midIt, last, isLeft, firstIt, withoutXIllegalFirst);
             //3. 归并按照y排序。
-            std::inplace_merge(first, midIt, last, [](It a, It b){
-                return Y_VALUE(a)<Y_VALUE(b);
+            std::inplace_merge(first, midIt, last, [](It a, It b) {
+                return Y_VALUE(a) < Y_VALUE(b);
             });
             //4. 归并求最近点对
             //4.1 左右中 更小的那个，记为 mergedClosestPoint 。
@@ -94,28 +122,27 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
             //4.2 准备归并范围
             T x_left = midX - merged_min_dist;
             T x_right = midX + merged_min_dist;
-#define BoundCheckX(x) \
-    if (!(x_left <= (x) && (x) <= x_right)) continue
+            const auto withoutXIllegalLast = std::copy_if(first, last, withoutXIllegalFirst, [&](It it){
+                return (x_left <= (X_VALUE(it)) && (X_VALUE(it)) <= x_right);
+            });
             //4.2 开始归并，寻找更近的点对
-            for (size_t i = 0; i < n; ++i) {
-                BoundCheckX(X_VALUE(first[i]));
-                //如果没有continue掉，就是在中间的，而且按照y顺序排好的一系列点。
-                for (size_t j = i + 1, validJ = 0; validJ < 6 && j < n; ++j) {
-                    BoundCheckX(X_VALUE(first[j]));
-                    if ((X_VALUE(first[i])<=midX)==(X_VALUE(first[j])<=midX))
-                        continue; //找异边的点, 如果同边，就过滤掉
+            for (; withoutXIllegalFirst < withoutXIllegalLast; ++withoutXIllegalFirst) {
+                int validJ = 0;
+                for (ItIt another = withoutXIllegalFirst + 1; validJ < 6 && another != withoutXIllegalLast; ++another) {
+                    if (GetIsLeft(*withoutXIllegalFirst) == GetIsLeft(*another))
+                        continue;//找异边的点, 如果同边，就过滤掉
                     validJ++;
-                    T dist = euclideanDistance(Point2D(first[i]), Point2D(first[j]));
+                    T dist = euclideanDistance(Point2D(*withoutXIllegalFirst), Point2D(*another));
                     if (dist < merged_min_dist) {
                         merged_min_dist = dist;
-                        mergedClosestPoint = {first[i], first[j]};
+                        mergedClosestPoint = {*withoutXIllegalFirst, *another};
                     }
                 }
             }
             return std::make_tuple(mergedClosestPoint, merged_min_dist);
         }
-    public:
 
+    public:
         template<typename T>
         std::tuple<int, int> ClosestPoint1D(const std::vector<T> &vec) const {
             assert(vec.size() >= 2);
@@ -139,25 +166,51 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
         }
 
 
-        template<typename T, size_t N>
-        std::array<int, 2> ClosestPointND(const std::vector<std::array<T, N>> &vec_nd) const {
-            assert(vec_nd.size() >= 2);
+        template<typename T, size_t N, typename It = typename std::vector<std::array<T, N>>::const_iterator>
+        std::tuple<std::array<It, 2>, T> findClosestPointPairND(const std::vector<std::array<T, N>> &vec_nd) const {
+            return findClosestPointPairND<T, N, typename std::vector<std::array<T, N>>::const_iterator>(vec_nd.cbegin(), vec_nd.cend());
+        }
+        template<typename T, size_t N, typename It = typename std::vector<std::array<T, N>>::const_iterator>
+        std::tuple<std::array<It, 2>, T> findClosestPointPairND(It first, const It last) const {
+            const auto size = std::distance(first, last);
+            assert(size >= 2);
             T min_dist = std::numeric_limits<T>::max();
-            std::array<int, 2> min_index{0, 1};
-            for (int i = 0; i < vec_nd.size(); i++) {
-                for (int j = i + 1; j < vec_nd.size(); j++) {
-                    //                min_diff = std::min(min_diff,  this->euclideanDistance(vec_nd[i], vec_nd[j])); 这样就无法获得ij
-                    T dist = this->euclideanDistance(vec_nd[i], vec_nd[j]);
+            std::array<It, 2> min_index{first, first + 1};
+            for (; first != last; ++first) {
+                for (It another = first + 1; another != last; ++another) {
+                    T dist = this->euclideanDistance(*first, *another);
                     if (min_dist > dist) {
                         min_dist = dist;
-                        min_index[0] = i;
-                        min_index[1] = j;
+                        min_index[0] = first;
+                        min_index[1] = another;
                     }
                 }
             }
-            return min_index;
+            return std::make_tuple(min_index, min_dist);
         }
 
+    private:
+        template<typename T, size_t N, typename It = typename std::vector<std::array<T, N>>::const_iterator,
+                 typename ItIt = typename std::vector<It>::iterator>
+        std::tuple<std::array<It, 2>, T> __findClosestPointPairND(ItIt first, const ItIt last) const {
+            const auto size = std::distance(first, last);
+            assert(size >= 2);
+            T min_dist = std::numeric_limits<T>::max();
+            std::array<It, 2> min_index{first[0], first[1]};
+            for (; first != last; ++first) {
+                for (ItIt another = first + 1; another != last; ++another) {
+                    T dist = this->euclideanDistance(**first, **another);
+                    if (min_dist > dist) {
+                        min_dist = dist;
+                        min_index[0] = *first;
+                        min_index[1] = *another;
+                    }
+                }
+            }
+            return std::make_tuple(min_index, min_dist);
+        }
+
+    public:
         template<typename T, size_t N>
         T euclideanDistance(const std::array<T, N> &a, const std::array<T, N> &b) const {
             T sum = 0;

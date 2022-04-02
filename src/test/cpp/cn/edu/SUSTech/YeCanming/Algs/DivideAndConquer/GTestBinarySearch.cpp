@@ -1,12 +1,12 @@
 //
 // Created by 叶璨铭 on 2022/4/2.
 //
+#include "cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/BinarySearch.hpp"
 #include "gtest/gtest.h"
+#include <algorithm>
 #include <boost/log/trivial.hpp>
 #include <numeric>
-#include <algorithm>
 #include <vector>
-#include "cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/BinarySearch.h"
 namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer;
     TEST(GTestBinarySearch, UsedToFindElement){

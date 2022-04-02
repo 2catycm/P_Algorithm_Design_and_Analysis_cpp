@@ -19,6 +19,13 @@ namespace cn::edu::SUSTech::YeCanming::std_containers {
             std::cout << std::get<0>(vec1[i]) <<", "<< std::get<1>(vec1[i])<<std::endl;
         }
     }
+    TEST(VectorAlgorithms, swap){
+        std::vector<double> a{2,3,4};
+        std::swap(a[0], a[2]);
+        std::copy(a.begin(), a.end(), std::ostream_iterator<int>(std::cout, " "));
+        EXPECT_EQ(a[0], 4);
+        EXPECT_EQ(a[2], 2);
+    }
     TEST(VectorAlgorithms, merge){
         //ref: https://zh.cppreference.com/w/cpp/algorithm/merge
         // 以随机数填充 vector
