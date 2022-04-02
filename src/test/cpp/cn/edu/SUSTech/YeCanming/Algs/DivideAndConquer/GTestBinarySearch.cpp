@@ -15,7 +15,11 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
         auto result = ThisPackage::binary_search_for_last_satisfies(a.begin(), a.end(), [](const int& a){
             return a<=5;
         });
-        ASSERT_EQ(*result, 5);
+        EXPECT_EQ(*result, 5);
+        auto resultC = ThisPackage::binary_search_for_last_satisfies(a.cbegin(), a.cend(), [](const int& a){
+            return a<=5;
+        });
+        EXPECT_EQ(*resultC, 5);
     }
     TEST(GTestBinarySearch, WhenSatifactionSequenceAreAllZero){
         std::vector<int> a(10);
@@ -23,6 +27,11 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
         auto result = ThisPackage::binary_search_for_last_satisfies(a.begin(), a.end(), [](const int& a){
             return a>11;
         });
+        EXPECT_EQ(result, a.end());
+        auto resultC = ThisPackage::binary_search_for_last_satisfies(a.cbegin(), a.cend(), [](const int& a){
+            return a>11;
+        });
+        EXPECT_EQ(result, a.cend());
     }
 }
 int main(int argc, char* argv[]){

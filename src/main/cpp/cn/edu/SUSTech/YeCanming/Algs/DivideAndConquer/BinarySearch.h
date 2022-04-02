@@ -26,16 +26,19 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
      * Time complexity: If std::distance(first, last) is n, then the time complexity is O(log n)
      */
     template<class It, class Pr>
-    It binary_search_for_last_satisfies(It first, It last, const Pr& pred){
-        while (std::distance(first, last)>0){ //当大于0的时候, 还有元素需要搜索。
-            It mid = first + (std::distance(first, last)>>1);
+    It binary_search_for_last_satisfies(const It first, const It last, const Pr& pred){
+        It left = first, right = last;
+        while (std::distance(left, right)>0){ //当大于0的时候, 还有元素需要搜索。
+            It mid = left + (std::distance(left, right)>>1);
             if (pred(*mid)){
-                first = mid + 1; //If it satisfies, try to find a better match.
+                left = mid + 1; //If it satisfies, try to find a better match.
             } else{
-                last = mid; //If it doesn't, we are now in the 0 section, let's try to look at
+                right = mid; //If it doesn't, we are now in the 0 section, let's try to look at
             }
         }
-        assert (std::distance(first, last)==0);
-        return first-1; //减1是因为first是激进指针，最后收敛的时候和last相等，但是last是一定不对的答案。
+        assert (std::distance(left, right)==0);
+        if (left==first)
+            return last; //全0的情况。如果first的左边有哨兵，那么是left-1，可惜C++管理左闭右开。
+        return left-1;//减1是因为 left 是激进指针，最后收敛的时候和 right 相等，但是 right 是一定不对的答案, 所以结果必然是left-1。
     }
 }
