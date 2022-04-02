@@ -34,7 +34,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer{
         std::vector<std::array<double, 2>> vec2d1 = {{1, 2},{3, 4}, {2.5, 10}, {10, 2.5}};
     };
     TEST_F(GTestClosestPoint, TestClosestPoint2D){
-        auto [cl, d] = closestPoint.findClosestPoint2D(vec2d1);
+        auto [cl, d] = closestPoint.findClosestPointPair2D(vec2d1);
         EXPECT_EQ(d, 2*sqrt(2));
         EXPECT_EQ(cl[0]+cl[1], 1);
         EXPECT_EQ(std::max(cl[0],cl[1])-std::min(cl[0],cl[1]), 1);
