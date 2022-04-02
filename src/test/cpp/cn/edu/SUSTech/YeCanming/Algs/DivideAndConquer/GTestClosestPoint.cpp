@@ -39,25 +39,51 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer{
         //random
         std::random_device rd;
     };
-    TEST_F(GTestClosestPoint, TestClosestPoint2DWhenXAreEqual){
-        std::mt19937 mt(rd());
-        std::uniform_int_distribution<> dis(0, 9);
-        auto N = 100;
-        std::vector<double> vec1d(N);
-        for (int i = 0; i < 100; ++i) {
-            std::generate(vec1d.begin(), vec1d.end(), std::bind(dis, std::ref(mt)));
-            std::vector<std::array<double, 2>> data(N);
-            for (int j = 0; j < N; ++j) {
-                data[j] = {20.0, vec1d[j]};
-            }
-            std::stringstream ss;
-            std::copy(vec1d.begin(), vec1d.end(), std::ostream_iterator<double>(ss, " "));
-            ss<<std::endl;
-            auto resultExpected = closestPoint.findClosestPointPairND<double, 2>(data);
-            auto resultActually = closestPoint.findClosestPointPair2D<double>(data);
-            EXPECT_EQ(std::get<1>(resultExpected),std::get<1>(resultActually))<<ss.str();
-        }
+    TEST_F(GTestClosestPoint, TestClosestPoint2DRandomlyWithND){
+
     }
+#define TEST_TestClosestPoint2DWhenXAreEqual_single(Name, ...) \
+  TEST_F(GTestClosestPoint, TestClosestPoint2DWhenXAreEqualSingle##Name) { \
+            std::vector<double> vec1d = { __VA_ARGS__ };                  \
+           ASSERT_NE(vec1d.size(), 0);                                                        \
+            std::vector<std::array<double, 2>> data(vec1d.size());                   \
+            for (int j = 0; j < vec1d.size(); ++j) {\
+                data[j] = {20.0, vec1d[j]};\
+            }\
+            std::stringstream ss;\
+            std::copy(vec1d.begin(), vec1d.end(), std::ostream_iterator<double>(ss, ", "));\
+            ss<<std::endl;\
+            auto resultExpected = closestPoint.findClosestPointPairND<double, 2>(data);\
+            auto resultActually = closestPoint.findClosestPointPair2D<double>(data);\
+            EXPECT_EQ(std::get<1>(resultExpected),std::get<1>(resultActually))<<ss.str();\
+    }
+#define TEST_TestClosestPoint2DWhenXAreEqual(Name, m, n)\
+    TEST_F(GTestClosestPoint, TestClosestPoint2DWhenXAreEqual##Name){\
+        std::mt19937 mt(rd());\
+        std::uniform_int_distribution<> dis(0, m);\
+        auto N = n;\
+        std::vector<double> vec1d(N);\
+        for (int i = 0; i < 100; ++i) {\
+            std::generate(vec1d.begin(), vec1d.end(), std::bind(dis, std::ref(mt)));\
+            std::vector<std::array<double, 2>> data(N);\
+            for (int j = 0; j < N; ++j) {\
+                data[j] = {20.0, vec1d[j]};\
+            }\
+            std::stringstream ss;\
+            std::copy(vec1d.begin(), vec1d.end(), std::ostream_iterator<double>(ss, ", "));\
+            ss<<std::endl;\
+            auto resultExpected = closestPoint.findClosestPointPairND<double, 2>(data);\
+            auto resultActually = closestPoint.findClosestPointPair2D<double>(data);\
+            EXPECT_EQ(std::get<1>(resultExpected),std::get<1>(resultActually))<<ss.str();\
+        }\
+    }
+    TEST_TestClosestPoint2DWhenXAreEqual(1, 100, 10)
+    TEST_TestClosestPoint2DWhenXAreEqual(2, 1000, 20)
+    TEST_TestClosestPoint2DWhenXAreEqual(3, 1000, 100)
+
+    //为什么过不了，因为原理错了。当x相等时候，不可能只看6个。也不能只看15个。 除非一开始排序的时候，进行先x后y的同比排序，关系才成立。
+    TEST_TestClosestPoint2DWhenXAreEqual_single(1, 32, 123, 827, 224, 686, 351, 171, 154, 678, 941, 574, 421, 769, 374, 905, 357, 215, 386, 885, 233)
+
     TEST_F(GTestClosestPoint, TestClosestPoint2D){
 #define Index(it) std::distance(vec2d1.cbegin(),it)
         auto [cl, d] = closestPoint.findClosestPointPair2D<double>(vec2d1);

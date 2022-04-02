@@ -126,7 +126,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
                 return (x_left <= (X_VALUE(it)) && (X_VALUE(it)) <= x_right);
             });
             //4.2 开始归并，寻找更近的点对
-            for (; withoutXIllegalFirst < withoutXIllegalLast; ++withoutXIllegalFirst) {
+            for (; withoutXIllegalFirst != withoutXIllegalLast; ++withoutXIllegalFirst) {
                 int validJ = 0;
                 for (ItIt another = withoutXIllegalFirst + 1; validJ < 6 && another != withoutXIllegalLast; ++another) {
                     if (GetIsLeft(*withoutXIllegalFirst) == GetIsLeft(*another))
