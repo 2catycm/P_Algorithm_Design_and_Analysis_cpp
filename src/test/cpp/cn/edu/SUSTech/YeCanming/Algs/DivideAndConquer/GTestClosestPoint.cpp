@@ -34,10 +34,11 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer{
         std::vector<std::array<double, 2>> vec2d1 = {{1, 2},{3, 4}, {2.5, 10}, {10, 2.5}};
     };
     TEST_F(GTestClosestPoint, TestClosestPoint2D){
-        auto [cl, d] = closestPoint.findClosestPointPair2D(vec2d1);
+#define Index(it) std::distance(vec2d1.cbegin(),it)
+        auto [cl, d] = closestPoint.findClosestPointPair2D<double>(vec2d1);
         EXPECT_EQ(d, 2*sqrt(2));
-        EXPECT_EQ(cl[0]+cl[1], 1);
-        EXPECT_EQ(std::max(cl[0],cl[1])-std::min(cl[0],cl[1]), 1);
+        EXPECT_EQ(Index(cl[0])+Index(cl[1]), 1);
+        EXPECT_EQ(std::max(Index(cl[0]),Index(cl[1]))-std::min(Index(cl[0]),Index(cl[1])), 1);
     }
     TEST_F(GTestClosestPoint, CanLog){
         BOOST_LOG_TRIVIAL(trace) << "A trace severity message";

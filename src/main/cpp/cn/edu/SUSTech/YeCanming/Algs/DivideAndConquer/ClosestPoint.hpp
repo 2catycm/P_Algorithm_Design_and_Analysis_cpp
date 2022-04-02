@@ -14,9 +14,9 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer;
     class ClosestPoint {
     public:
-        template<typename T>
-        std::tuple<std::array<size_t, 2>, T> findClosestPointPair2D(const std::vector<std::array<T, 2>> &vec2d) const {
-            return findClosestPointPair2D(vec2d.cbegin(), vec2d.cend());
+        template<typename T, typename It=typename std::vector<std::array<T, 2>>::const_iterator>
+        std::tuple<std::array<It, 2>, T> findClosestPointPair2D(const std::vector<std::array<T, 2>> &vec2d) const {
+            return findClosestPointPair2D<T>(vec2d.cbegin(), vec2d.cend());
         }
         /**
          * Efficient algorithm implementation for finding closest 2d point pair among a set of points.
@@ -38,18 +38,19 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
          */
         template<typename T, typename It=typename std::vector<std::array<T, 2>>::const_iterator>
         std::tuple<std::array<It, 2>, T> findClosestPointPair2D(const It first,
-                                                                const It last) {
+                                                                const It last) const{
             //for example, first-to-last-container is [<3,0>, <1,0>, <2,0>]
             const auto N = std::distance(first, last);
             //for example, size=3
             std::vector<It> vec2d_its(N); //rather than add an attribute to record the index, we use iterator instead.
-            for (It from = first, to = vec2d_its.begin(); from!=last; std::advance(from, 1), std::advance(to, 1)){
+            auto to = vec2d_its.begin();
+            for (It from = first; from!=last; std::advance(from, 1), std::advance(to, 1)){
                 *to = from;
             }//for example, vec2d_its=[0, 1, 2]. 0,1,2 are pointers or indexes or so-called iterator.
             std::sort(vec2d_its.begin(), vec2d_its.end(), [](It a, It b){
                 return (*a)[0]<(*b)[0];
             });//for example, vec2d_its=[1, 0, 2]. meaning that first-to-last-container c satisfies c[1].x < c[0].x < c[2].x .
-            return findClosestPointPair2DRecursively(vec2d_its.begin(), vec2d_its.end());
+            return findClosestPointPair2DRecursively<T>(vec2d_its.begin(), vec2d_its.end());
         }
     private:
         template<typename T, typename It = typename std::vector<std::array<T, 2>>::const_iterator,
@@ -69,7 +70,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
             //2.1 趁着现在是x有序的，先把中间的x的值找出来
             const auto midX = X_VALUE(first[midIndex]);  // <=midX的都是左边，>midX的是右边。
             //2.1 不要低估这一步的重要性：根据midX重新分配minIndex。 这能把O(n)的情况节省为O(logn)
-            ItIt midIt = ThisPackage::binary_search_for_last_satisfies(first+midIndex, last, [](It it){
+            ItIt midIt = ThisPackage::binary_search_for_last_satisfies(first+midIndex, last, [&](It it){
                 return X_VALUE(it)<=midX;
             })+1; //midIt是右边x的第一个。
             //2.2 递归求解得到答案，同时左右变成了y有序。

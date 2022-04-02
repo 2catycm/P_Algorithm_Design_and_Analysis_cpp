@@ -3,6 +3,7 @@
 //
 #pragma once
 #include <cassert>
+#include <iterator>
 namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer;
     /**
