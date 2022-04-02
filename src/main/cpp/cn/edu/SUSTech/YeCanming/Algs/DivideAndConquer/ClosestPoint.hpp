@@ -52,7 +52,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
                 *to = from;
             }//for example, vec2d_its=[0, 1, 2]. 0,1,2 are pointers or indexes or so-called iterator.
             std::sort(vec2d_its.begin(), vec2d_its.end(), [](It a, It b) {
-                return (*a)[0] < (*b)[0];
+                return (*a)[0]==(*b)[0]?(*a)[1] < (*b)[1]:(*a)[0] < (*b)[0];
             });//for example, vec2d_its=[1, 0, 2]. meaning that first-to-last-container c satisfies c[1].x < c[0].x < c[2].x .
             std::vector<bool> isLeft(N);
             std::vector<It> withoutXIllegal(N);
