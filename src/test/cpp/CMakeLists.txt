@@ -12,6 +12,10 @@ add_executable(GTestClosestPoint cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/
 target_link_libraries(GTestClosestPoint GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
 target_link_libraries(GTestClosestPoint ${Boost_LOG_LIBRARY})
 
+add_executable(GTestBinarySearch cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/GTestBinarySearch.cpp)
+target_link_libraries(GTestBinarySearch GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
+target_link_libraries(GTestBinarySearch ${Boost_LOG_LIBRARY})
+
 
 add_executable(Includer cn/edu/SUSTech/YeCanming/Includer/includer.cpp)
 #target_link_libraries(Includer Boost::boost Boost::Log)
