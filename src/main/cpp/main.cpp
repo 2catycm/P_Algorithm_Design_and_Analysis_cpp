@@ -3,7 +3,7 @@
 using cn::edu::SUSTech::YeCanming::Algs::ClosestPoint;
 int main() {
     ClosestPoint closestPoint;
-    auto a = closestPoint.ClosestPoint1D<double>({1, 2, 3, 3.5, 3.75, 4.25});
+    auto a = closestPoint.findClosestPointPair1D<double>({1, 2, 3, 3.5, 3.75, 4.25});
     std::cout<<std::get<0>(a)<<std::endl;
     std::cout<<std::get<1>(a)<<std::endl;
     std::cout << "Hello, World!" << std::endl;
