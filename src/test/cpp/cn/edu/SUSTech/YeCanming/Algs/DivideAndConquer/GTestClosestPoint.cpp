@@ -10,29 +10,6 @@
 namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer{
     class GTestClosestPoint : public ::testing::Test {
     protected:
-        // You can remove any or all of the following functions if their bodies would
-        // be empty.
-        GTestClosestPoint() {
-            // You can do set-up work for each test here.
-        }
-        ~GTestClosestPoint() override {
-            // You can do clean-up work that doesn't throw exceptions here.
-        }
-
-        // If the constructor and destructor are not enough for setting up
-        // and cleaning up each test, you can define the following methods:
-
-        void SetUp() override {
-            // Code here will be called immediately after the constructor (right
-            // before each test).
-        }
-
-        void TearDown() override {
-            // Code here will be called immediately after each test (right
-            // before the destructor).
-        }
-        // Class members declared here can be used by all tests in the test suite
-        // for Foo.
         ClosestPoint closestPoint;
         std::vector<std::array<double, 2>> vec2d1 = {{1, 2},{3, 4}, {2.5, 10}, {10, 2.5}};
 
@@ -40,6 +17,9 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer{
         std::random_device rd;
     };
     TEST_F(GTestClosestPoint, TestClosestPoint2DRandomlyWithND){
+        auto m = int(1e7);
+        std::mt19937 mt(rd());
+        std::uniform_int_distribution<> dis(-m, m);
 
     }
 #define TEST_TestClosestPoint2DWhenXAreEqual_single(Name, ...) \
@@ -57,13 +37,13 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer{
             auto resultActually = closestPoint.findClosestPointPair2D<double>(data);\
             EXPECT_EQ(std::get<1>(resultExpected),std::get<1>(resultActually))<<ss.str();\
     }
-#define TEST_TestClosestPoint2DWhenXAreEqual(Name, m, n)\
+#define TEST_TestClosestPoint2DWhenXAreEqual(Name, m, n, times)\
     TEST_F(GTestClosestPoint, TestClosestPoint2DWhenXAreEqual##Name){\
         std::mt19937 mt(rd());\
-        std::uniform_int_distribution<> dis(0, m);\
+        std::uniform_int_distribution<> dis(-(m), m);\
         auto N = n;\
         std::vector<double> vec1d(N);\
-        for (int i = 0; i < 100; ++i) {\
+        for (int i = 0; i < (times); ++i) {\
             std::generate(vec1d.begin(), vec1d.end(), std::bind(dis, std::ref(mt)));\
             std::vector<std::array<double, 2>> data(N);\
             for (int j = 0; j < N; ++j) {\
@@ -72,14 +52,16 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer{
             std::stringstream ss;\
             std::copy(vec1d.begin(), vec1d.end(), std::ostream_iterator<double>(ss, ", "));\
             ss<<std::endl;\
-            auto resultExpected = closestPoint.findClosestPointPairND<double, 2>(data);\
+            auto resultExpected = closestPoint.findClosestPointPair1D<double>(vec1d);\
             auto resultActually = closestPoint.findClosestPointPair2D<double>(data);\
             EXPECT_EQ(std::get<1>(resultExpected),std::get<1>(resultActually))<<ss.str();\
         }\
     }
-    TEST_TestClosestPoint2DWhenXAreEqual(1, 100, 10)
-    TEST_TestClosestPoint2DWhenXAreEqual(2, 1000, 20)
-    TEST_TestClosestPoint2DWhenXAreEqual(3, 1000, 100)
+    TEST_TestClosestPoint2DWhenXAreEqual(1, 100, 10, 100)
+    TEST_TestClosestPoint2DWhenXAreEqual(2, 1000, 20, 100)
+    TEST_TestClosestPoint2DWhenXAreEqual(3, 1000, 100, 100)
+    TEST_TestClosestPoint2DWhenXAreEqual(4, 1e7, 1e3, 50)
+    TEST_TestClosestPoint2DWhenXAreEqual(5, 1e7, 1e4, 5)
 
     //为什么过不了，因为原理错了。当x相等时候，不可能只看6个。也不能只看15个。 除非一开始排序的时候，进行先x后y的同比排序，关系才成立。
     TEST_TestClosestPoint2DWhenXAreEqual_single(1, 32, 123, 827, 224, 686, 351, 171, 154, 678, 941, 574, 421, 769, 374, 905, 357, 215, 386, 885, 233)
