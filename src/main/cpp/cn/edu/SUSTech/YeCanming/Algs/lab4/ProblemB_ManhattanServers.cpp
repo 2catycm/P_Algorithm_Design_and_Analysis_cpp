@@ -14,6 +14,7 @@
 #include <vector>
 namespace cn::edu::SUSTech::YeCanming::Algs::lab4 {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::lab4;
+
     template<class It>
     int solveServers(const It xFirst, const It xLast, const It yFirst, const It yLast) {
         const auto N = std::distance(xFirst, xLast);
