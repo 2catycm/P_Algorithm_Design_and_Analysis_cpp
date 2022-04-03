@@ -143,26 +143,72 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
         }
 
     public:
+#define ARR_T(T, N) std::array<T, N>
+#define CItARR_T(T, N) typename std::vector<ARR_T(T, N)>::const_iterator
+#define CIt_T(T) typename std::vector<T>::const_iterator
         template<typename T>
-        std::tuple<int, int> ClosestPoint1D(const std::vector<T> &vec) const {
-            assert(vec.size() >= 2);
-            std::vector<std::tuple<T, int>> v(vec.size());
-            for (int i = 0; i < vec.size(); ++i) {
-                v[i] = std::make_tuple(vec[i], i);
-            }
-            std::sort(v.begin(), v.end(), [](std::tuple<T, int> a, std::tuple<T, int> b) {
-                return std::get<0>(a) < std::get<0>(b);
-            });
-            int min_sorted_index = 0;
-            T min_diff = std::get<0>(v[1]) - std::get<0>(v[0]);
-            for (int i = 1; i < v.size() - 1; ++i) {
-                T diff = std::get<0>(v[i + 1]) - std::get<0>(v[i]);
+        std::tuple<std::array<CIt_T(T), 2>, T> findClosestPointPair1D(const std::vector<T> &vec) const {
+            return findClosestPointPair1D<T>(vec.cbegin(), vec.cend());
+        }
+        template<typename T>
+        std::tuple<std::array<CIt_T(T), 2>, T> findClosestPointPair1D(const CIt_T(T) first, const CIt_T(T) last) const {
+            using It = CIt_T(T);
+            using ItIt = typename std::vector<It>::iterator;
+            //for example, first-to-last-container is [<3,0>, <1,0>, <2,0>]
+            const auto N = std::distance(first, last);
+            //for example, size=3
+            std::vector<It> vec2d_its(N);//rather than add an attribute to record the index, we use iterator instead.
+            auto to = vec2d_its.begin();
+            for (It from = first; from != last; std::advance(from, 1), std::advance(to, 1)) {
+                *to = from;
+            }//for example, vec2d_its=[0, 1, 2]. 0,1,2 are pointers or indexes or so-called iterator.
+            std::sort(vec2d_its.begin(), vec2d_its.end(), [](It a, It b) {
+                return (*a) < (*b);
+            });//for example, vec2d_its=[1, 0, 2]. meaning that first-to-last-container c satisfies c[1].x < c[0].x < c[2].x .
+
+            ItIt minIt = vec2d_its.begin();
+            T min_diff = *(minIt[1]) - *(minIt[0]);
+            //            T min_diff = std::numeric_limits<T>::max();
+            for (ItIt it = vec2d_its.begin()+1;it!=(vec2d_its.end()-1); ++it) {
+                T diff = *(it[1]) - *(it[0]);
                 if (diff < min_diff) {
-                    min_sorted_index = i;
+                    minIt = it;
                     min_diff = diff;
                 }
             }
-            return std::tuple<int, int>{std::get<1>(v[min_sorted_index]), std::get<1>(v[min_sorted_index + 1])};
+            return {{minIt[0], minIt[1]}, min_diff};
+        }
+        template<typename T>
+        std::tuple<std::array<CItARR_T(T, 1), 2>, T> findClosestPointPair1D(const std::vector<std::array<T, 1>> &vec) const {
+            return findClosestPointPair1D(vec.cbegin(), vec.cend());
+        }
+        template<typename T>
+        std::tuple<std::array<CItARR_T(T, 1), 2>, T> findClosestPointPair1D(const CItARR_T(T, 1) first, const CItARR_T(T, 1) last) const {
+            using It = CItARR_T(T, 1);
+            using ItIt = typename std::vector<It>::iterator;
+            //for example, first-to-last-container is [<3,0>, <1,0>, <2,0>]
+            const auto N = std::distance(first, last);
+            //for example, size=3
+            std::vector<It> vec2d_its(N);//rather than add an attribute to record the index, we use iterator instead.
+            auto to = vec2d_its.begin();
+            for (It from = first; from != last; std::advance(from, 1), std::advance(to, 1)) {
+                *to = from;
+            }//for example, vec2d_its=[0, 1, 2]. 0,1,2 are pointers or indexes or so-called iterator.
+            std::sort(vec2d_its.begin(), vec2d_its.end(), [](It a, It b) {
+                return (*a)[0] < (*b)[0];
+            });//for example, vec2d_its=[1, 0, 2]. meaning that first-to-last-container c satisfies c[1].x < c[0].x < c[2].x .
+
+            ItIt minIt = vec2d_its.begin();
+            T min_diff = **minIt[1] - **minIt[0];
+//            T min_diff = std::numeric_limits<T>::max();
+            for (ItIt it = vec2d_its.begin()+1;it!=vec2d_its.end(); ++it) {
+                T diff = **it[1] - **it[0];
+                if (diff < min_diff) {
+                    minIt = it;
+                    min_diff = diff;
+                }
+            }
+            return std::make_tuple({minIt[0], minIt[1]}, min_diff);
         }
 
 
