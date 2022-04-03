@@ -1,6 +1,4 @@
 include_directories(.)
 
-add_executable(P_Algorithm_Design_and_Analysis_cpp main.cpp)
-
-add_library(P_Algorithm_Design_and_Analysis_cpp_closest_point_lib cn/edu/SUSTech/YeCanming/Algs/ClosestPoint.cpp)
-target_link_libraries(P_Algorithm_Design_and_Analysis_cpp P_Algorithm_Design_and_Analysis_cpp_closest_point_lib)
+add_oj_submittable(P_Algorithm_Design_and_Analysis_cpp . main)
+add_oj_submittable(Lab4ProblemB cn/edu/SUSTech/YeCanming/Algs/lab4 ProblemB_ManhattanServers)

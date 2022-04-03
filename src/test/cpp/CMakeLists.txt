@@ -2,8 +2,22 @@ include_directories(../../main/cpp)
 include_directories(.)
 
 find_package(GTest CONFIG REQUIRED)
+find_package(Boost COMPONENTS log REQUIRED)
 
-add_executable(TestClosestPoint cn/edu/SUSTech/YeCanming/Algs/TestClosestPoint.cpp)
-target_link_libraries(TestClosestPoint P_Algorithm_Design_and_Analysis_cpp_closest_point_lib)
+add_executable(GTestClosestPoint cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/GTestClosestPoint.cpp)
+target_link_libraries(GTestClosestPoint GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
+target_link_libraries(GTestClosestPoint ${Boost_LOG_LIBRARY})
 
-target_link_libraries(TestClosestPoint GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
+add_executable(GTestBinarySearch cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/GTestBinarySearch.cpp)
+target_link_libraries(GTestBinarySearch GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
+target_link_libraries(GTestBinarySearch ${Boost_LOG_LIBRARY})
+
+
+add_executable(Includer cn/edu/SUSTech/YeCanming/Includer/includer.cpp)
+#target_link_libraries(Includer Boost::boost Boost::Log)
+
+add_executable(GTestVector cn/edu/SUSTech/YeCanming/std_containers/GTestVector.cpp)
+target_link_libraries(GTestVector GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
+
+add_executable(GTestLab4B cn/edu/SUSTech/YeCanming/Algs/lab4/GTestLab4B.cpp)
+target_link_libraries(GTestLab4B GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
