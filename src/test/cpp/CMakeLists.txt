@@ -1,12 +1,14 @@
 include_directories(../../main/cpp)
 include_directories(.)
 
+enable_testing()
 find_package(GTest CONFIG REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
 find_package(Boost COMPONENTS log REQUIRED)
 
 add_executable(GTestClosestPoint cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/GTestClosestPoint.cpp)
-target_link_libraries(GTestClosestPoint GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
-target_link_libraries(GTestClosestPoint ${Boost_LOG_LIBRARY})
+target_link_libraries(GTestClosestPoint ${GTEST_LIBRARIES})
+#target_link_libraries(GTestClosestPoint ${Boost_LOG_LIBRARY})
 
 add_executable(GTestBinarySearch cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/GTestBinarySearch.cpp)
 target_link_libraries(GTestBinarySearch GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)

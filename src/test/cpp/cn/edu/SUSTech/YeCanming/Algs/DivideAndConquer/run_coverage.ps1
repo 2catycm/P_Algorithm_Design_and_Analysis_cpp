@@ -1,0 +1,1 @@
+OpenCppCoverage.exe --sources "." -- "..\..\..\..\..\..\..\..\cmake-build-debug\src\test\cpp\GTestClosestPoint.exe"

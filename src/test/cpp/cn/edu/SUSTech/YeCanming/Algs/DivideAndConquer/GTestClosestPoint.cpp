@@ -3,7 +3,7 @@
 //
 #include "cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/ClosestPoint.hpp"
 #include "gtest/gtest.h"
-#include <boost/log/trivial.hpp>
+//#include <boost/log/trivial.hpp>
 #include <numeric>
 #include <random>
 #include <sstream>
@@ -73,14 +73,14 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer{
         EXPECT_EQ(Index(cl[0])+Index(cl[1]), 1);
         EXPECT_EQ(std::max(Index(cl[0]),Index(cl[1]))-std::min(Index(cl[0]),Index(cl[1])), 1);
     }
-    TEST_F(GTestClosestPoint, CanLog){
-        BOOST_LOG_TRIVIAL(trace) << "A trace severity message";
-        BOOST_LOG_TRIVIAL(debug) << "A debug severity message";
-        BOOST_LOG_TRIVIAL(info) << "An informational severity message";
-        BOOST_LOG_TRIVIAL(warning) << "A warning severity message";
-        BOOST_LOG_TRIVIAL(error) << "An error severity message";
-        BOOST_LOG_TRIVIAL(fatal) << "A fatal severity message";
-    }
+//    TEST_F(GTestClosestPoint, CanLog){
+//        BOOST_LOG_TRIVIAL(trace) << "A trace severity message";
+//        BOOST_LOG_TRIVIAL(debug) << "A debug severity message";
+//        BOOST_LOG_TRIVIAL(info) << "An informational severity message";
+//        BOOST_LOG_TRIVIAL(warning) << "A warning severity message";
+//        BOOST_LOG_TRIVIAL(error) << "An error severity message";
+//        BOOST_LOG_TRIVIAL(fatal) << "A fatal severity message";
+//    }
 }
 int main(int argc, char* argv[])
 {

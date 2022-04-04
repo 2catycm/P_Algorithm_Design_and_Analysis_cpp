@@ -38,7 +38,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::lab4 {
                 leaveTime[i] = std::max(arriveTime[i], latestAppearTime[i]);
             }
             for (const auto &letter : letters) {
-                cost += arriveTime[letter.to] - letter.appearTime;
+                cost += int64_t(arriveTime[letter.to] - letter.appearTime);
             }
             //加速优化 iteration
             int64_t accumulatedAffectedLetters = 0;
@@ -46,11 +46,11 @@ namespace cn::edu::SUSTech::YeCanming::Algs::lab4 {
                 if (arriveTime[i] <= latestAppearTime[i]) {
                     //情况1：被挡住了。 包括等于，因为等于的时候，加速后仍然不能减少leaveTime
                     // 归零, 因为加速这一段和前面的任何一段，都无法影响后面的信件。
-                    accumulatedAffectedLetters = receivedLetterCnt[i];//但是到达这里的信件还是可以影响的。
+                    accumulatedAffectedLetters = (int64_t)receivedLetterCnt[i];//但是到达这里的信件还是可以影响的。
                 } else {
                     //情况2：优化机会可以传递。
                     // 加速这一段，可以影响后面的和这里的信件。
-                    accumulatedAffectedLetters += receivedLetterCnt[i];
+                    accumulatedAffectedLetters += (int64_t)receivedLetterCnt[i];
                 }
                 influenceFactor[i - 1] = accumulatedAffectedLetters;
             }
