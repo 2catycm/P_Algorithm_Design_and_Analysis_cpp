@@ -7,7 +7,7 @@ and it has a Google test suite [here](https://github.com/2catycm/P_Algorithm_Des
 
 The test suite is passed and has a code coverage of 97%
 
-![image-20220404150143009](C:\Users\YeCanming\AppData\Roaming\Typora\typora-user-images\image-20220404150143009.png)
+![image-20220404150143009](ClosetPointPair.assets\image-20220404150143009.png)
 
 [TOC]
 
