@@ -4,12 +4,30 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <random>
+#include <algorithm>
 #include <vector>
 namespace cn::edu::SUSTech::YeCanming::std_containers {
     TEST(VectorAsDynamicArray, CanTest){
         std::cout<<"hello"<<std::endl;
     }
-    TEST(VectorAsDynamicArray, PredefinedSize){
+    TEST(VectorAsDynamicArray, PredefinedSize_AutoInitialization){
+        // std::vector<int>
+        std::vector<int> vec(10);
+        EXPECT_TRUE(std::all_of(vec.begin(), vec.end(), [](int a){
+            return a==0;
+        }));
+        // 单个 A
+        struct A {int a; int b;};
+        A a;
+        EXPECT_NE(a.a, 0);
+        EXPECT_NE(a.b, 0);
+        // std::vector<A>
+        std::vector<A> vec2(10);
+        EXPECT_TRUE(std::all_of(vec2.begin(), vec2.end(), [](A a){
+            return a.a == 0 && a.b==0;
+        }));
+    }
+    TEST(VectorAsDynamicArray, PredefinedSize1){
         std::vector<std::tuple<int,int>> vec1(10);
         vec1.emplace_back(2,2);
         vec1.push_back({4,3});

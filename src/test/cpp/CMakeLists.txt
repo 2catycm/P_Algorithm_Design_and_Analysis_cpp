@@ -19,5 +19,5 @@ add_executable(Includer cn/edu/SUSTech/YeCanming/Includer/includer.cpp)
 add_executable(GTestVector cn/edu/SUSTech/YeCanming/std_containers/GTestVector.cpp)
 target_link_libraries(GTestVector GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
 
-add_executable(GTestLab4B cn/edu/SUSTech/YeCanming/Algs/lab4/GTestLab4B.cpp)
+add_executable(GTestLab4B cn/edu/SUSTech/YeCanming/Algs/lab4/GTestLab4B.cpp cn/edu/SUSTech/YeCanming/Algs/lab4/GTestLab4A.cpp)
 target_link_libraries(GTestLab4B GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
