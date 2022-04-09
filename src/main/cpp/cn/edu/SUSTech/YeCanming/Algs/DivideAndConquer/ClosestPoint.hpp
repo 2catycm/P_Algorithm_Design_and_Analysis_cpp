@@ -257,10 +257,10 @@ namespace cn::edu::SUSTech::YeCanming::Algs::DivideAndConquer {
         }
 
     public:
-        template<typename T, size_t N>
-        T euclideanDistance(const std::array<T, N> &a, const std::array<T, N> &b) const {
+        template<typename T, size_t K>
+        T euclideanDistance(const std::array<T, K> &a, const std::array<T, K> &b) const {
             T sum = 0;
-            for (int i = 0; i < N; ++i) {
+            for (int i = 0; i < K; ++i) {
                 T diff = a[i] - b[i];
                 sum += diff * diff;
             }
