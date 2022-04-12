@@ -15,7 +15,8 @@ namespace cn::edu::SUSTech::YeCanming::cpplang {
 //        auto chars = reinterpret_cast<char[4]>(uint32_t(0x12345678'12345678));
 //        auto integer = reinterpret_cast<uint32_t>("123"); //not this one
 
-        //这是个好的思路，C语言就很厉害了. C++在这个问题上没什么用。（不要std copy）
+        //这是个好的思路，C语言就很厉害了, 恰恰是因为C语言不在意类型.
+        // C++在这个问题上没什么用。（不要std copy， 你以为的类型安全，其实我要的效果是洞悉内存）
         //1. 复制 uint32_t 为 char[4]
         uint32_t ui = 0x1234'5678u; //小端顺序
         char cs[4];
