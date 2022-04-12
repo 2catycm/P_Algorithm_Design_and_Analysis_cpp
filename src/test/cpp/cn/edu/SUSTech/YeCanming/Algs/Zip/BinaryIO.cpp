@@ -5,6 +5,7 @@
 #include <fstream>
 #include <filesystem>
 #include <iostream>
+#include <cstring>
 namespace cn::edu::SUSTech::YeCanming::Algs::Zip {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip;
     /**
@@ -27,9 +28,25 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip {
         std::fstream file{"./test.binary"
         , std::ios::binary| std::ios::out|std::ios::trunc};
         ASSERT_TRUE(file.is_open());
-//        file<<21<<0<<'a';
+//        file<<21<<0<<'a'; 格式输出
         file.put(21).put(0).put('a');
+        EXPECT_EQ(3, file.tellp());
         file.write("123", 4);
+        EXPECT_EQ(7, file.tellp());
+    }
+    TEST(BinaryIO, CanRead){
+        std::fstream file{"./test.binary",
+                          std::ios::binary| std::ios::in};
+        ASSERT_TRUE(file.is_open());
+        char buffer[100];
+//        file>>a; 格式输入
+//        file.get(buffer[0]).get(buffer[1]).get(buffer[2]);
+//        file.read(buffer, 4);
+        file.read(buffer, 7);
+        EXPECT_EQ(buffer[0], 21);
+        EXPECT_EQ(buffer[1], 0);
+        EXPECT_EQ(buffer[2], 'a');
+        EXPECT_TRUE(std::strncmp(buffer+3,"123",4)==0);
     }
 }
 int main(int argc, char *argv[]) {

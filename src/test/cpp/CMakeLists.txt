@@ -26,6 +26,6 @@ target_link_libraries(GTestVector GTest::gmock GTest::gtest GTest::gmock_main GT
 add_executable(GTestLab4B cn/edu/SUSTech/YeCanming/Algs/lab4/GTestLab4B.cpp cn/edu/SUSTech/YeCanming/Algs/lab4/GTestLab4A.cpp)
 target_link_libraries(GTestLab4B GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
 
-add_executable(BinaryIO cn/edu/SUSTech/YeCanming/Algs/Zip/BinaryIO.cpp)
+add_executable(BinaryIO cn/edu/SUSTech/YeCanming/Algs/Zip/BinaryIO.cpp cn/edu/SUSTech/YeCanming/Algs/Zip/FileSystemTest.cpp)
 target_link_libraries(BinaryIO ${GTEST_LIBRARIES})
 #target_link_libraries(BinaryIO GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)

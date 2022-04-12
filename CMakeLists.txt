@@ -18,7 +18,9 @@ if(MSVC)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
     #OpenMP支持
     add_compile_options("-fopenmp")
+    #C++新语法支持
     add_compile_options("-fconcepts")
+    add_compile_options("-lstdc++fs")
     #    add_compile_options("-mavx2")
     #    add_compile_options("-funsafe-math-optimizations")
 
@@ -41,7 +43,10 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     #OpenMP支持
     message("clang")
     add_compile_options("-fopenmp")
+    #C++新语法支持
     add_compile_options("-fconcepts")
+    add_compile_options("-lc++fs")
+
     add_compile_options("-fopt-info")
     set(_CXX_FLAGS)
     if(_march_native_works)
