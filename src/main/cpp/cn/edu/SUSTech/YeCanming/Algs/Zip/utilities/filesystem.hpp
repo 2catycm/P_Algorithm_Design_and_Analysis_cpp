@@ -4,8 +4,8 @@
 #pragma once
 #include <filesystem>
 #include <stack>
-namespace cn::edu::SUSTech::YeCanming::Algs::Zip::Utilities {
-    namespace ThisPackage = ::cn::edu::SUSTech::YeCanming::Algs::Zip::Utilities;
+namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
+    namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip::utilities;
     namespace stdfs = std::filesystem;
     namespace filesystem {
         /**

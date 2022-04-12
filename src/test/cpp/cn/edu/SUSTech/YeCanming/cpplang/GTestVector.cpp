@@ -6,7 +6,7 @@
 #include <random>
 #include <algorithm>
 #include <vector>
-namespace cn::edu::SUSTech::YeCanming::std_containers {
+namespace cn::edu::SUSTech::YeCanming::cpplang {
     TEST(VectorAsDynamicArray, CanTest){
         std::cout<<"hello"<<std::endl;
     }
