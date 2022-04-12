@@ -6,6 +6,8 @@ find_package(GTest CONFIG REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 find_package(Boost COMPONENTS log REQUIRED)
 
+set(GTEST_LIBRARIES GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
+
 add_executable(GTestClosestPoint cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/GTestClosestPoint.cpp)
 target_link_libraries(GTestClosestPoint ${GTEST_LIBRARIES})
 #target_link_libraries(GTestClosestPoint ${Boost_LOG_LIBRARY})
@@ -23,3 +25,7 @@ target_link_libraries(GTestVector GTest::gmock GTest::gtest GTest::gmock_main GT
 
 add_executable(GTestLab4B cn/edu/SUSTech/YeCanming/Algs/lab4/GTestLab4B.cpp cn/edu/SUSTech/YeCanming/Algs/lab4/GTestLab4A.cpp)
 target_link_libraries(GTestLab4B GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
+
+add_executable(BinaryIO cn/edu/SUSTech/YeCanming/Algs/Zip/BinaryIO.cpp)
+target_link_libraries(BinaryIO ${GTEST_LIBRARIES})
+#target_link_libraries(BinaryIO GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
