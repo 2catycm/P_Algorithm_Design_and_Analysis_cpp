@@ -20,7 +20,7 @@ target_link_libraries(GTestBinarySearch ${Boost_LOG_LIBRARY})
 add_executable(Includer cn/edu/SUSTech/YeCanming/Includer/includer.cpp)
 #target_link_libraries(Includer Boost::boost Boost::Log)
 
-add_executable(GTestVector cn/edu/SUSTech/YeCanming/cpplang/GTestVector.cpp cn/edu/SUSTech/YeCanming/cpplang/GTestLiterals.cpp)
+add_executable(GTestVector cn/edu/SUSTech/YeCanming/cpplang/GTestVector.cpp cn/edu/SUSTech/YeCanming/cpplang/GTestLiterals.cpp cn/edu/SUSTech/YeCanming/cpplang/GTestCMemory.cpp)
 target_link_libraries(GTestVector GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
 
 add_executable(GTestLab4B cn/edu/SUSTech/YeCanming/Algs/lab4/GTestLab4B.cpp cn/edu/SUSTech/YeCanming/Algs/lab4/GTestLab4A.cpp)
