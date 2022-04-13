@@ -11,6 +11,7 @@ namespace cn::edu::SUSTech::YeCanming::cpplang {
         uint32_t b = 0x0403'4b50;
         EXPECT_EQ(0x04034b50, b);
     }
+
     TEST(GTestLiterals, reinterpret){
 //        auto chars = reinterpret_cast<char[4]>(uint32_t(0x12345678'12345678));
 //        auto integer = reinterpret_cast<uint32_t>("123"); //not this one
@@ -42,7 +43,42 @@ namespace cn::edu::SUSTech::YeCanming::cpplang {
         uint32_t validate4 = 0x1234'5678u;
         EXPECT_EQ(ui4, validate4);
     }
-
+    TEST(GTestLiterals, reinterpret_with_align_struct){
+        struct aligned{
+            char a;
+            int b;
+            short c;
+            int d;
+        };
+        EXPECT_EQ(4*sizeof (int), sizeof(aligned)); //对齐法则参考：https://blog.csdn.net/keyearth/article/details/6129882
+        aligned a {0x12, 0x23, 0x34, 0x45};
+        char* cs1 = (char*)(&a);
+        char validate1[] = {0x45, 0x00, 0x00, 0x00,
+                            0x34, 0x00, 0x00, 0x00,
+                            0x23, 0x00, 0x00, 0x00,
+                            0x12, 0x00, 0x00, 0x00};
+        EXPECT_NE(0, memcmp(cs1, validate1, sizeof(a)))<<cs1; //错在结构体不是大端序；结构体对齐不只是补零
+        unsigned char validate2[] = {0x12, 0xcc, 0xcc, 0xcc,
+                                     0x23, 0x00, 0x00, 0x00,
+                                     0x34, 0x00, 0xcc, 0xcc,
+                                     0x45, 0x00, 0x00, 0x00};
+        EXPECT_EQ(0, memcmp(cs1, validate2, sizeof(a)))<<cs1;
+    }
+    TEST(GTestLiterals, reinterpret_with_unalign_struct){
+#pragma pack(1)
+        struct unaligned {
+            char a;
+            int b;
+            short c;
+            int d;
+        };
+#pragma pack()
+        EXPECT_EQ(sizeof (int)*2+sizeof(char)+sizeof(short), sizeof(unaligned));
+        unaligned a {0x12, 0x23, 0x34, 0x45};
+        char* cs1 = (char*)(&a);
+        char validate1[] = {0x12, 0x23, 0x00, 0x00, 0x00, 0x34, 0x00, 0x45, 0x00, 0x00, 0x00};
+        EXPECT_EQ(0, memcmp(cs1, validate1, sizeof(a)))<<cs1;
+    }
     // https://zh.cppreference.com/w/cpp/language/integer_literal
     // 字面量的类型 规则
     // 无后缀非十进制，优先int，不能表示换unsigned, 再不行换long

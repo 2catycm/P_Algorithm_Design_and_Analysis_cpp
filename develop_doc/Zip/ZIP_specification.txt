@@ -416,7 +416,7 @@ Copyright (c) 1989 - 2014, 2018, 2019, 2020 PKWARE Inc., All Rights Reserved.
         uncompressed size               4 bytes
 
       4.3.9.1 This descriptor MUST exist if bit 3 of the general
-      purpose bit flag is set (see below).  It is byte aligned
+      purpose bit flag is set (see below).  It is byte unaligned
       and immediately follows the last byte of compressed data.
       This descriptor SHOULD be used only when it was not possible to
       seek in the output .ZIP file, e.g., when the output .ZIP file
@@ -2183,7 +2183,7 @@ Value     Size      Description
        Bit 0: Last Block bit     This bit is set to 1 if this is the last
                                  compressed block in the data.
        Bits 1-2: Block type
-          00 (0) - Block is stored - All stored data is byte aligned.
+          00 (0) - Block is stored - All stored data is byte unaligned.
                    Skip bits until next byte, then next word = block
                    length, followed by the ones compliment of the block
                    length word. Remaining data in block is the stored
@@ -2282,7 +2282,7 @@ Value     Size      Description
        read header from input stream.
 
        if stored block
-          skip bits until byte aligned
+          skip bits until byte unaligned
           read count and 1's compliment of count
           copy count bytes data block
        otherwise
@@ -2303,7 +2303,7 @@ Value     Size      Description
     while not last block
 
     if data descriptor exists
-       skip bits until byte aligned
+       skip bits until byte unaligned
        read crc and sizes
     endif
 
