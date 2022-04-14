@@ -13,12 +13,24 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip::utilities;
     TEST(MyFileSystem, CanTest) {}
     TEST(MyFileSystem, PrintName) {
-        auto r = ThisPackage::filesystem::preorderTraversal({CMAKE_PROJECT_DIR}, [](const std::filesystem::path &path) {});
-        std::cout << "Totally " << r << " Files have been scanned." << std::endl;
-        r = ThisPackage::filesystem::preorderTraversal({std::string(CMAKE_PROJECT_DIR) + "/bin"}, [](const std::filesystem::path &path) {
+        size_t cnt = 0;
+        auto r = ThisPackage::filesystem::preorderTraversal(std::filesystem::path{CMAKE_PROJECT_DIR} / "testData" / "Zip" / "filecnt" / "five", [&](const std::filesystem::path &path) {
+            ++cnt;
             std::cout << path << std::endl;
+            return true;
         });
-        std::cout << "Totally " << r << " Files have been scanned." << std::endl;
+        EXPECT_TRUE(r);
+        std::cout << "Totally " << cnt << " Files have been scanned." << std::endl;
+        EXPECT_EQ(5+1, cnt); //还包括directory，所以+1
+        cnt = 0;
+        r = ThisPackage::filesystem::preorderTraversal({std::filesystem::path{CMAKE_PROJECT_DIR} / "testData" / "Zip" / "filecnt" / "zero"}, [&](const std::filesystem::path &path) {
+            ++cnt;
+            std::cout << path << std::endl;
+            return true;
+        });
+        EXPECT_TRUE(r);
+        std::cout << "Totally " << cnt << " Files have been scanned." << std::endl;
+        EXPECT_EQ(0+1, cnt); //还包括directory，所以+1
     }
     using namespace std::chrono_literals;
     //https://stackoverflow.com/questions/61030383/how-to-convert-stdfilesystemfile-time-type-to-time-t?msclkid=e4adf3faba6911ecb78dd1ec928b9478
@@ -68,8 +80,25 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
     TEST(StdFileSystem, time_t) {
         time_t a = time(NULL);
         printf("It is %s now.\n", ctime(&a));
-        tm* b = localtime(&a);
+        tm *b = localtime(&a);
         printf("It is %s now.\n", asctime(b));
+    }
+
+    TEST(StdFileSystem, relativePath){
+        auto base = stdfs::path{CMAKE_PROJECT_DIR};
+        auto current_path = base /"testData"/"Zip"/"filecnt"/"five";
+        auto relative = stdfs::relative(current_path, base);
+        EXPECT_EQ(relative.string(), "testData/Zip/filecnt/five");
+    }
+
+    TEST(StdFileSystem, SeperatorTest){
+        auto separator = stdfs::path::preferred_separator; //wchar_t
+        static_assert(std::is_same_v<decltype(separator), wchar_t>);
+        std::wcout<<separator<<std::endl;
+        EXPECT_EQ('/', separator);
+        EXPECT_EQ('\\', separator);
+        //宽字符字面量，例如 L'β' 或 L'猫'。
+        // 这种字面量具有 wchar_t 类型，且其值等于c字符 在执行宽字符集中的值
     }
 
 }// namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities

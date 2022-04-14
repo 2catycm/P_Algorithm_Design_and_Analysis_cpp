@@ -8,6 +8,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip::utilities;
     namespace stdfs = std::filesystem;
     namespace filesystem {
+        static constexpr char preferred_separator = '/'; //instead of '\\'
         /**
          * We use the iterative preorder traversal algorithm to improve performance.
          * Instead of recursion, which may break down when the file system is too large,
@@ -19,20 +20,21 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
          * @return file_visited
          */
         template<typename Lambda>
-        size_t preorderTraversal(const stdfs::path &path, const Lambda &fileVisitor) {
-            size_t file_visited = 0;
+        bool preorderTraversal(const stdfs::path &path, const Lambda &fileVisitor) {
             std::stack<stdfs::path> S;
-            if (stdfs::exists(path)) S.emplace(path);
+            if (!stdfs::exists(path))
+                return false;
+            S.emplace(path);
             while (!S.empty()) {
                 auto current_path = S.top();
                 S.pop();
-                fileVisitor(current_path);
-                ++file_visited;
+                if(!fileVisitor(current_path))
+                    return false;
                 if (stdfs::is_directory(current_path))
                     for (auto &p : stdfs::directory_iterator(current_path))
                         S.emplace(p.path());
             }
-            return file_visited;
+            return true;
         }
         //TODO post order traversal. (may be it is hard to be iterative because it is not a binary tree. )
     }// namespace filesystem
