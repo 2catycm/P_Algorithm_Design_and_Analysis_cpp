@@ -8,6 +8,7 @@
 #include <filesystem>
 namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip::entities;
+#pragma pack(1)
     struct LastWriteTime {
         uint16_t mTime{0};// 文件最后写入时间。
         uint16_t mDate{0};// 文件最后写入时间。
@@ -48,4 +49,5 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
             return std::mktime(&tm_time);
         }
     };
+#pragma pack()
 }// namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities
