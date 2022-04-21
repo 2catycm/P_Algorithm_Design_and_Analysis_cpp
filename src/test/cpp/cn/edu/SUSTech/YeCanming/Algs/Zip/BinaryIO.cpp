@@ -6,6 +6,7 @@
 #include <fstream>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <sstream>
 namespace cn::edu::SUSTech::YeCanming::Algs::Zip {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip;
     /**
@@ -62,6 +63,42 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip {
             cnt += fileIn.gcount();
         }
         EXPECT_EQ(cnt, 7);
+    }
+    TEST(BinaryIO, CanMoveFromOneStreamToAnother){
+        char a[] = {'a', 0x0C, 0x7F};
+        std::stringstream ss;
+        ss.write(a, sizeof(a));
+        std::fstream fileOut{"./testFromStringStream.binary",
+                             std::ios::binary | std::ios::out | std::ios::trunc};
+        ASSERT_TRUE(fileOut.is_open());
+        EXPECT_EQ(ss.tellg(), 0); 
+        ss.seekg(0);//既然是0，其实也不必seek
+        fileOut<<ss.rdbuf();
+        // fileOut.write(ss.str().data(), ss.str().size());
+        EXPECT_EQ(fileOut.tellp(), sizeof(a));
+        fileOut.flush(); //不flush什么都没有
+        std::fstream fileIn{"./testFromStringStream.binary",
+                            std::ios::binary | std::ios::in};
+        ASSERT_TRUE(fileIn.is_open());
+        char buffer[sizeof(a)];
+        fileIn.read(buffer, sizeof(a));
+        EXPECT_EQ(0, memcmp(buffer, a, sizeof(a)))/* <<"buffer: "<<buffer */;
+    }
+    TEST(BinaryIO, CanWriteString){
+        std::string s = "abc"; // with a \0 at the end
+        EXPECT_EQ(s.size(), 3); //而不是4.
+        std::fstream fileOut{"./testCanWriteString.binary",
+                             std::ios::binary | std::ios::out | std::ios::trunc};
+        fileOut.write(reinterpret_cast<const char *>(s.c_str()), s.size());
+        fileOut<<s; //亦不会写出\0
+        EXPECT_EQ(fileOut.tellp(), s.size()*2);
+        fileOut.flush();
+        std::fstream fileIn{"./testCanWriteString.binary",
+                            std::ios::binary | std::ios::in};
+        char buffer[10];
+        fileIn.read(buffer, 10);
+        EXPECT_EQ(0, memcmp(buffer, (s+s).c_str(), 6));
+        EXPECT_NE(0, memcmp(buffer, (s+s).c_str(), 7));
     }
 }// namespace cn::edu::SUSTech::YeCanming::Algs::Zip
 int main(int argc, char *argv[]) {

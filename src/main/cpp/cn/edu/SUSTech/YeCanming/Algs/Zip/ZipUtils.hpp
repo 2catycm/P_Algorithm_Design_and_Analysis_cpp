@@ -3,9 +3,11 @@
 //
 #pragma once
 #include "entities/LocalFileHeader.hpp"
+#include "entities/CentralDirectoryHeader.hpp"
 #include "utilities/filesystem.hpp"
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 namespace cn::edu::SUSTech::YeCanming::Algs::Zip {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip;
     namespace stdfs = std::filesystem;
@@ -21,14 +23,20 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip {
             std::fstream dst_file{dst.c_str(), std::ios::binary | std::ios::out | std::ios::trunc};
             if (!dst_file.is_open())
                 return false;
-            return utilities::filesystem::preorderTraversal(src, [&](const stdfs::path &current_path) {
+            std::stringstream centralDirectoryHeaders;
+            utilities::filesystem::preorderTraversal(src, [&](const stdfs::path &current_path) {
                 if (--limit < 0)
                     return false;
                 const auto relativePath = stdfs::relative(current_path, src);
+                const auto offset = dst_file.tellp();
                 entities::LocalFileHeader header{current_path, relativePath};
-
-                return false;
+                dst_file<<header;
+                entities::CentralDirectoryHeader cdheader{header, offset};
+                centralDirectoryHeaders<<cdheader;
+                return true;
             });
+            dst_file<<centralDirectoryHeaders.rdbuf();
+            return true;
         }
         bool compress(const std::string &src, const std::string &dst) {
             return compress(stdfs::path(src), stdfs::path(dst), size_t(-1));

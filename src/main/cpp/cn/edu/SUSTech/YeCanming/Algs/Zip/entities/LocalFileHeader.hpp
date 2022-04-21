@@ -35,19 +35,20 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
         char* dataStream;
         /**
          * 将本结构体Local Header，fileName和压缩之后的文件流DataStream写入二进制文件。
-         * @param fs 目标文件。
+         * @param fs 目标文件流。
          * @return fs
          */
-        friend std::fstream &operator<<(std::fstream &fs, const LocalFileHeader &header) {
+        friend std::ostream &operator<<(std::ostream &fs, const LocalFileHeader &header) {
             constexpr auto fixedSize = sizeof(header) - sizeof(header.fileName)-sizeof(header.dataStream);
             fs.write(reinterpret_cast<const char *>(&header), fixedSize);
-            fs.write(reinterpret_cast<const char *>(header.fileName.c_str()), header.fileNameSize);
+            // fs.write(reinterpret_cast<const char *>(header.fileName.c_str()), header.fileNameSize);
+            fs<<header.fileName; //直接打印string即可，不会有\0。
             fs.write(header.dataStream, header.compressedSize);
             return fs;
         }
         LocalFileHeader(stdfs::path const &current_path, stdfs::path const &relativePath)
             : lastWriteTime{stdfs::last_write_time(current_path)},
-              fileName{relativePath.string()}, fileNameSize(relativePath.string().size()) {
+              fileName{relativePath.generic_string()}, fileNameSize{relativePath.generic_string().size()} {
             if (stdfs::is_regular_file(current_path) && stdfs::file_size(current_path) != 0) {
                 // 非空一般文件。
                 std::ifstream fileIn{current_path.string(), std::ios::binary | std::ios::in};
