@@ -28,7 +28,12 @@ target_link_libraries(GTestLab4B GTest::gmock GTest::gtest GTest::gmock_main GTe
 
 find_package(ZLIB REQUIRED)
 
-add_executable(BinaryIO cn/edu/SUSTech/YeCanming/Algs/Zip/BinaryIO.cpp cn/edu/SUSTech/YeCanming/Algs/Zip/FileSystemTest.cpp cn/edu/SUSTech/YeCanming/Algs/Zip/ZlibTest.cpp cn/edu/SUSTech/YeCanming/Algs/Zip/EntityTest.cpp)
-target_link_libraries(BinaryIO ${GTEST_LIBRARIES})
-target_link_libraries(BinaryIO ZLIB::ZLIB)
+add_executable(ZipProjectTest cn/edu/SUSTech/YeCanming/Algs/Zip/BinaryIO.cpp 
+cn/edu/SUSTech/YeCanming/Algs/Zip/FileSystemTest.cpp 
+cn/edu/SUSTech/YeCanming/Algs/Zip/ZlibTest.cpp 
+cn/edu/SUSTech/YeCanming/Algs/Zip/EntityTest.cpp
+cn/edu/SUSTech/YeCanming/Algs/Zip/ZipUtilsTest.cpp
+)
+target_link_libraries(ZipProjectTest ${GTEST_LIBRARIES})
+target_link_libraries(ZipProjectTest ZLIB::ZLIB)
 #target_link_libraries(BinaryIO GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)

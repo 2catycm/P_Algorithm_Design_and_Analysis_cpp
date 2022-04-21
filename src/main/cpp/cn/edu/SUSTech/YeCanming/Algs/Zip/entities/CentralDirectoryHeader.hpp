@@ -8,7 +8,8 @@
 namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip::entities;
 #ifdef _WIN32
-#define VERSION_MADE_BY 10
+// #define VERSION_MADE_BY 10
+#define VERSION_MADE_BY 0x3F
 #elif linux
 #define VERSION_MADE_BY 3
 #elif __APPLE__

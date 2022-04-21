@@ -2,8 +2,9 @@
 // Created by 叶璨铭 on 2022/4/12.
 //
 #pragma once
-#include "entities/LocalFileHeader.hpp"
 #include "entities/CentralDirectoryHeader.hpp"
+#include "entities/LocalFileHeader.hpp"
+#include "entities/EndOfCentralDirectoryHeader.hpp"
 #include "utilities/filesystem.hpp"
 #include <filesystem>
 #include <fstream>
@@ -24,18 +25,30 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip {
             if (!dst_file.is_open())
                 return false;
             std::stringstream centralDirectoryHeaders;
-            utilities::filesystem::preorderTraversal(src, [&](const stdfs::path &current_path) {
-                if (--limit < 0)
-                    return false;
-                const auto relativePath = stdfs::relative(current_path, src);
-                const auto offset = dst_file.tellp();
-                entities::LocalFileHeader header{current_path, relativePath};
-                dst_file<<header;
-                entities::CentralDirectoryHeader cdheader{header, offset};
-                centralDirectoryHeaders<<cdheader;
-                return true;
-            });
-            dst_file<<centralDirectoryHeaders.rdbuf();
+            uint16_t fileCnt{0}, directoryCnt{0};
+            if (!utilities::filesystem::preorderTraversal(src, [&](const stdfs::path &current_path) {
+                    if (--limit < 0)
+                        return false;
+                    if(stdfs::is_regular_file(current_path))
+                        ++fileCnt;
+                    else{
+                        assert(stdfs::is_directory(current_path)); //symbolic link is not supported yet.
+                        ++directoryCnt;
+                    }
+                    const auto relativePath = stdfs::relative(current_path, src/"..");
+                    const uint32_t offset = dst_file.tellp();
+                    entities::LocalFileHeader header{current_path, relativePath};
+                    dst_file << header;
+                    entities::CentralDirectoryHeader cdheader{header, offset};
+                    centralDirectoryHeaders << cdheader;
+                    return true;
+                }))
+                return false;
+            uint32_t centralHeaderBegin = dst_file.tellp();
+            uint32_t centralHeaderBytes = centralDirectoryHeaders.tellp();
+            dst_file << centralDirectoryHeaders.rdbuf();
+            entities::EndOfCentralDirectoryHeader endHeader{directoryCnt, fileCnt, centralHeaderBytes,centralHeaderBegin};
+            dst_file << endHeader;
             return true;
         }
         bool compress(const std::string &src, const std::string &dst) {
