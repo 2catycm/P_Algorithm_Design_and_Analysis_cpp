@@ -17,5 +17,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip {
     TEST(ZipUtilsTest, CanCompressChinese){
         const auto testDataPath = stdfs::path(CMAKE_PROJECT_DIR)/"testData"/ "Zip";
         ZipUtils::compress(testDataPath/L"家", testDataPath/L"实际生成-家.zip");
+        ZipUtils::compress(testDataPath/L"我的电脑", testDataPath/L"实际生成-我的电脑.zip");
+        // ZipUtils::compress(testDataPath.generic_string()+"家", testDataPath.generic_string()+"实际生成-家.zip");
     }
 }

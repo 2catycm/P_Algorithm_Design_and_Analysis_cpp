@@ -59,7 +59,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
         char buffer1[1024], buffer2[1024];
         fileIn.read(buffer1, 1024);
         fileInVerify.read(buffer2, 1024);
-        ASSERT_EQ(0, memcmp(buffer1, buffer2, fileIn.gcount()));
+        EXPECT_MEMEQ(buffer1, buffer2, fileIn.gcount());
     }
     TEST(TestLastWriteTime, construct) {
         auto p = std::filesystem::temp_directory_path() / "example.bin";//operator / can append a pair of paths together

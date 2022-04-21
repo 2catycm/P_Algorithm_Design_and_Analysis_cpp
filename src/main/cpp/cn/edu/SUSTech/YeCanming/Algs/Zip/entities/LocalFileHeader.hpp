@@ -32,7 +32,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
         // - 没有扩展，就不用写。
         //由于长度未知，所以不能放在结构体内。
         std::string fileName;
-        std::stringstream dataStream;
+        std::stringstream dataStream{"", std::ios::in | std::ios::out | std::ios::binary};
         /**
          * 将本结构体Local Header，fileName和压缩之后的文件流DataStream写入二进制文件。
          * @param fs 目标文件流。
@@ -127,12 +127,6 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
             this->method = 0;
             this->compressedSize = uncompressedSize;
             dataStream<<fileIn.rdbuf();
-            // constexpr size_t chunk = 1024;
-            // for (char buffer[chunk]; !fileIn.eof();) {
-            //     const auto &readCnt = fileIn.tellg();
-            //     fileIn.read(buffer, sizeof(buffer));
-            //     dataStream.write(buffer, fileIn.gcount());
-            // }
         }
     };
 #pragma pack()
