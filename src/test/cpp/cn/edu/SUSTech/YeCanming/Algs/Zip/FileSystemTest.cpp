@@ -3,12 +3,15 @@
 //
 #include "cn/edu/SUSTech/YeCanming/Algs/Zip/utilities/filesystem.hpp"
 #include <chrono>
+#include <cstddef>
 #include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <gtest/gtest.h>
 #include <iomanip>
 #include <iostream>
+#include <span>
+#include <string_view>
 namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip::utilities;
     TEST(MyFileSystem, CanTest) {}
@@ -21,7 +24,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
         });
         EXPECT_TRUE(r);
         std::cout << "Totally " << cnt << " Files have been scanned." << std::endl;
-        EXPECT_EQ(5+1, cnt); //还包括directory，所以+1
+        EXPECT_EQ(5 + 1, cnt);//还包括directory，所以+1
         cnt = 0;
         r = ThisPackage::filesystem::preorderTraversal({std::filesystem::path{CMAKE_PROJECT_DIR} / "testData" / "Zip" / "filecnt" / "zero"}, [&](const std::filesystem::path &path) {
             ++cnt;
@@ -30,7 +33,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
         });
         EXPECT_TRUE(r);
         std::cout << "Totally " << cnt << " Files have been scanned." << std::endl;
-        EXPECT_EQ(0+1, cnt); //还包括directory，所以+1
+        EXPECT_EQ(0 + 1, cnt);//还包括directory，所以+1
     }
     using namespace std::chrono_literals;
     //https://stackoverflow.com/questions/61030383/how-to-convert-stdfilesystemfile-time-type-to-time-t?msclkid=e4adf3faba6911ecb78dd1ec928b9478
@@ -84,21 +87,56 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
         printf("It is %s now.\n", asctime(b));
     }
 
-    TEST(StdFileSystem, relativePath){
+    TEST(StdFileSystem, relativePath) {
         auto base = stdfs::path{CMAKE_PROJECT_DIR};
-        auto current_path = base /"testData"/"Zip"/"filecnt"/"five";
+        auto current_path = base / "testData" / "Zip" / "filecnt" / "five";
         auto relative = stdfs::relative(current_path, base);
-        EXPECT_EQ(relative.string(), "testData/Zip/filecnt/five");
+        EXPECT_EQ(relative.generic_string(), "testData/Zip/filecnt/five");
     }
 
-    TEST(StdFileSystem, SeperatorTest){
-        auto separator = stdfs::path::preferred_separator; //wchar_t
+    TEST(StdFileSystem, SeperatorTest) {
+        auto separator = stdfs::path::preferred_separator;//wchar_t
         static_assert(std::is_same_v<decltype(separator), wchar_t>);
-        std::wcout<<separator<<std::endl;
-        EXPECT_EQ('/', separator);
+        std::wcout << separator << std::endl;
+        EXPECT_NE('/', separator);
         EXPECT_EQ('\\', separator);
         //宽字符字面量，例如 L'β' 或 L'猫'。
         // 这种字面量具有 wchar_t 类型，且其值等于c字符 在执行宽字符集中的值
+        stdfs::path a = "a/b/c";
+        a /= "d";
+        EXPECT_EQ(a, "a/b/c/d");
+        a.make_preferred();
+        EXPECT_EQ(a, "a\\b\\c\\d");
+        a /= "e";
+        EXPECT_EQ(a, "a\\b\\c\\d\\e");
     }
+    // https://zh.cppreference.com/w/cpp/filesystem/path/generic_string
+    TEST(StdFileSystem, GenericPathString) {
+        auto print = [](std::string_view rem, auto const &str) {
+            std::cout << rem << std::hex << std::uppercase << std::setfill('0');
+            for (const auto b : std::as_bytes(std::span{str})) {
+                std::cout << std::setw(2) << std::to_integer<unsigned>(b) << ' ';
+            }
+            std::cout << '\n';
+        };
+            //    std::filesystem::path p{CMAKE_PROJECT_DIR "/testData"};
+        //        std::filesystem::path p{L##CMAKE_PROJECT_DIR L"/testData/家/屋\\我的电脑"};
+            //    std::filesystem::path p{"/家/屋"};
+        auto p = stdfs::path{CMAKE_PROJECT_DIR} / L"/testData/家/屋\\我的电脑";
+        std::cout << p.string() << '\n';
+        std::cout << p.generic_string() << '\n';//这里我们说的重点不是中文路径问题，而是说windows平台分隔符换成了通用分隔符。
+        print("string    : ", p.generic_string());
+        print("u8string  : ", p.generic_u8string());
+        print("u16string : ", p.generic_u16string());
+        print("u32string : ", p.generic_u32string());
+        //  print("wstring   : ", p.generic_wstring  ());
+        //  gcc-11.0.0 2020.12.30 仍然失败， clang-10 - ok
+    }
+    TEST(StdFileSystem, 中文测试) {
+        char16_t 中文变量 = L'简';// 用UTF-16表示
 
+    }
+    TEST(StdFileSystem, 中文路径问题) {
+
+    }
 }// namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities
