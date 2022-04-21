@@ -64,7 +64,13 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip {
         }
         EXPECT_EQ(cnt, 7);
     }
-    TEST(BinaryIO, CanMoveFromOneStreamToAnother){
+    TEST(BinaryIO, CanMoveFromOneStreamToAnother1){
+        std::ifstream fileIn{CMAKE_PROJECT_DIR"/README.md",
+                             std::ios::binary | std::ios::in};
+        ASSERT_TRUE(fileIn.is_open());
+        std::cout<<fileIn.rdbuf();
+    }
+    TEST(BinaryIO, CanMoveFromOneStreamToAnother2){
         char a[] = {'a', 0x0C, 0x7F};
         std::stringstream ss;
         ss.write(a, sizeof(a));

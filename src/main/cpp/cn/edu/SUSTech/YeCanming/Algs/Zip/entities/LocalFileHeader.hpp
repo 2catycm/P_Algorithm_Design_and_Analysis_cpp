@@ -32,7 +32,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
         // - 没有扩展，就不用写。
         //由于长度未知，所以不能放在结构体内。
         std::string fileName;
-        char *dataStream{nullptr};
+        std::stringstream dataStream;
         /**
          * 将本结构体Local Header，fileName和压缩之后的文件流DataStream写入二进制文件。
          * @param fs 目标文件流。
@@ -43,8 +43,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
             fs.write(reinterpret_cast<const char *>(&header), fixedSize);
             // fs.write(reinterpret_cast<const char *>(header.fileName.c_str()), header.fileNameSize);
             fs << header.fileName;//直接打印string即可，不会有\0。
-            if (header.dataStream != nullptr)
-                fs.write(header.dataStream, header.compressedSize);
+            fs << header.dataStream.rdbuf();
             return fs;
         }
         LocalFileHeader(stdfs::path const &current_path, stdfs::path const &relativePath)
@@ -72,19 +71,68 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
         }
 
     private:
+        // int deflateFile(std::ifstream &fileIn, int level) {
+        //     fileIn.clear();//这一句不能没有。
+        //     fileIn.seekg(0L, std::ios::beg);
+        //     constexpr size_t chunk = 1024;
+        //     unsigned char in[chunk];
+        //     unsigned char out[chunk];
+        //     //标志
+        //     int ret, flush;
+        //     unsigned have;
+        //     // 初始化z_stream结构体。
+        //     z_stream strm;
+        //     strm.zalloc = Z_NULL;
+        //     strm.zfree = Z_NULL;
+        //     strm.opaque = Z_NULL;
+        //     ret = deflateInit(&strm, level);
+        //     if (ret != Z_OK)
+        //         return ret;
+        //     do {
+        //         fileIn.read(reinterpret_cast<char *>(in), sizeof(in));
+        //         strm.avail_in = fileIn.tellg();
+        //         if (fileIn.bad()) {
+        //             (void) deflateEnd(&strm);
+        //             return Z_ERRNO;
+        //         }
+        //         flush = fileIn.eof() ? Z_FINISH : Z_NO_FLUSH;
+        //         strm.next_in = in;
+
+        //         /* 如果buffer不够大，就一次读不完。这里让所有source都读完才结束循环。 */
+        //         do {
+        //             strm.avail_out = chunk;
+        //             strm.next_out = out;
+        //             ret = deflate(&strm, flush);   /* no bad return value */
+        //             assert(ret != Z_STREAM_ERROR); /* state not clobbered */
+        //             have = chunk - strm.avail_out;
+        //             if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
+        //                 (void) deflateEnd(&strm);
+        //                 return Z_ERRNO;
+        //             }
+        //         } while (strm.avail_out == 0);
+        //         assert(strm.avail_in == 0); /* all input will be used */
+
+        //         /* done when last data in file processed */
+        //     } while (flush != Z_FINISH);
+        //     assert(ret == Z_STREAM_END); /* stream will be complete */
+
+        //     /* clean up and return */
+        //     (void) deflateEnd(&strm);
+        //     return Z_OK;
+        // }
         void storeFile(std::ifstream &fileIn) {
             //注意传参细节，传递可修改的引用。
             fileIn.clear();//这一句不能没有。
             fileIn.seekg(0L, std::ios::beg);
             this->method = 0;
             this->compressedSize = uncompressedSize;
-            dataStream = new char[compressedSize];
-            constexpr size_t chunk = 1024;
-            for (char buffer[chunk]; !fileIn.eof();) {
-                const auto &readCnt = fileIn.tellg();
-                fileIn.read(buffer, sizeof(buffer));
-                std::memcpy(dataStream + readCnt, buffer, fileIn.gcount());
-            }
+            dataStream<<fileIn.rdbuf();
+            // constexpr size_t chunk = 1024;
+            // for (char buffer[chunk]; !fileIn.eof();) {
+            //     const auto &readCnt = fileIn.tellg();
+            //     fileIn.read(buffer, sizeof(buffer));
+            //     dataStream.write(buffer, fileIn.gcount());
+            // }
         }
     };
 #pragma pack()
