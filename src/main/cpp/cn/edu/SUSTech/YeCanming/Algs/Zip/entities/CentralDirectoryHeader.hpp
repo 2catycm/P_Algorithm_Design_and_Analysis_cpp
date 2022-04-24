@@ -49,8 +49,10 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
         friend std::ostream &operator<<(std::ostream &fs, const CentralDirectoryHeader &header) {
             constexpr auto fixedSize = sizeof(header) - sizeof(header.fileName);
             fs.write(reinterpret_cast<const char *>(&header), fixedSize);
+            assert(fs.good());
             // fs.write(reinterpret_cast<const char *>(header.fileName.c_str()), header.fileNameSize);
             fs<<header.fileName; //直接打印string即可，不会有\0。
+            assert(fs.good());
             return fs;
         }
         CentralDirectoryHeader(LocalFileHeader const & localHeader, uint32_t offset)

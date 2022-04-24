@@ -12,12 +12,16 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip {
     TEST(ZipUtilsTest, CanTest){}
     TEST(ZipUtilsTest, CanCompressSimple){
         const auto testDataPath = stdfs::path(CMAKE_PROJECT_DIR)/"testData"/ "Zip";
-        ZipUtils::compress(testDataPath/"sampleDirectory", testDataPath/"sampleActually.zip");
+        EXPECT_TRUE(ZipUtils::compress(testDataPath/"sampleDirectory", testDataPath/"sampleActually.zip"));
     }
     TEST(ZipUtilsTest, CanCompressChinese){
         const auto testDataPath = stdfs::path(CMAKE_PROJECT_DIR)/"testData"/ "Zip";
-        ZipUtils::compress(testDataPath/L"家", testDataPath/L"实际生成-家.zip");
-        ZipUtils::compress(testDataPath/L"我的电脑", testDataPath/L"实际生成-我的电脑.zip");
+        EXPECT_TRUE( ZipUtils::compress(testDataPath/L"家", testDataPath/L"实际生成-家.zip"));
+        EXPECT_TRUE(ZipUtils::compress(testDataPath/L"我的电脑", testDataPath/L"实际生成-我的电脑.zip"));
         // ZipUtils::compress(testDataPath.generic_string()+"家", testDataPath.generic_string()+"实际生成-家.zip");
     }
+}
+int main(int argc, char *argv[]) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

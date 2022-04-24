@@ -39,16 +39,21 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip {
                     const uint32_t offset = dst_file.tellp();
                     entities::LocalFileHeader header{current_path, relativePath};
                     dst_file << header;
+                    assert(dst_file.good());
                     entities::CentralDirectoryHeader cdheader{header, offset};
                     centralDirectoryHeaders << cdheader;
+                    assert(centralDirectoryHeaders.good());
                     return true;
                 }))
                 return false;
             uint32_t centralHeaderBegin = dst_file.tellp();
             uint32_t centralHeaderBytes = centralDirectoryHeaders.tellp();
             dst_file << centralDirectoryHeaders.rdbuf();
+            assert(dst_file.good());
             entities::EndOfCentralDirectoryHeader endHeader{directoryCnt, fileCnt, centralHeaderBytes,centralHeaderBegin};
             dst_file << endHeader;
+            assert(dst_file.good());
+            dst_file.close();
             return true;
         }
         bool compress(const std::string &src, const std::string &dst) {

@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.16)
 project(P_Algorithm_Design_and_Analysis_cpp)
 # 语言标准
 set(CMAKE_CXX_STANDARD 20)
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
 # 编译器选项
 if(MSVC)
     #utf-8支持

@@ -27,6 +27,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
         friend std::ostream &operator<<(std::ostream &fs, const EndOfCentralDirectoryHeader &header) {
             constexpr auto fixedSize = sizeof(header);
             fs.write(reinterpret_cast<const char *>(&header), fixedSize);
+            assert(fs.good());
             return fs;
         }
     };

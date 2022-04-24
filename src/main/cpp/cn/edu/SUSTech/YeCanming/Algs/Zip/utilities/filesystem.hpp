@@ -3,6 +3,7 @@
 //
 #pragma once
 #include <filesystem>
+#include <cassert>
 #include <stack>
 namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip::utilities;
@@ -37,5 +38,20 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
             return true;
         }
         //TODO post order traversal. (may be it is hard to be iterative because it is not a binary tree. )
+
+        /**
+         * @param path the path you want to normalize.
+         * @return the normalized file name string.
+         * For example, if a directory is named "dir", it should be "dir/" to avoid conflict with a file "dir".
+         */
+        auto normalized_string(stdfs::path relativePath, const stdfs::path& realPath)->decltype(relativePath.generic_string()) {
+            auto str = relativePath.generic_string();
+            if (stdfs::is_regular_file(realPath))
+                return str;
+            assert(stdfs::is_directory(realPath));
+            if (str.back() != preferred_separator)
+                str.back() = preferred_separator; //插入一个'/', 因为zip文件中的目录名称以'/'结尾 
+            return str;
+        }
     }// namespace filesystem
 }// namespace cn::edu::SUSTech::YeCanming::Algs::Zip::Utilities
