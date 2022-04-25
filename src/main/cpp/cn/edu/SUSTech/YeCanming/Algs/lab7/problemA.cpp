@@ -7,7 +7,7 @@
 #include <vector>
 #include <limits>
 std::vector<uint32_t> weight;
-std::vector<uint32_t> _prefix_sum;
+std::vector<uint64_t> _prefix_sum;
 void prefix_sum(){
    _prefix_sum.push_back(0);
     for (size_t i = 0; i < weight.size(); i++)
