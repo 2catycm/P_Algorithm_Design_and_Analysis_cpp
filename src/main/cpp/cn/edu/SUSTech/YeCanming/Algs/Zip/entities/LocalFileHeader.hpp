@@ -2,6 +2,8 @@
 // Created by 叶璨铭 on 2022/4/12.
 //
 #pragma once
+#include "../utilities/BitOutputStream.hpp"
+#include "../utilities/DeflateBlock.hpp"
 #include "../utilities/filesystem.hpp"
 #include "LastWriteTime.hpp"
 #include <cassert>
@@ -12,6 +14,7 @@
 namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip::entities;
     namespace stdfs = std::filesystem;
+    namespace utils = cn::edu::SUSTech::YeCanming::Algs::Zip::utilities;
     namespace zipfs = cn::edu::SUSTech::YeCanming::Algs::Zip::utilities::filesystem;
     //已检查：1. byte 与 specification 一致。 2. 魔法数字没有抄错。
 #pragma pack(1)
@@ -62,6 +65,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
                 assert(fileIn.is_open());
                 constexpr size_t chunk = 1024;
                 // 先算crc32，uncompressedSize
+                // 参考 https://www.zlib.net/manual.html 中crc32_z函数的说明。
                 this->uncompressedSize = stdfs::file_size(current_path);
                 uint32_t crc = crc32_z(0L, Z_NULL, 0);
                 for (char buffer[chunk]; !fileIn.eof();) {
@@ -93,6 +97,20 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
             dataStream.seekp(0L, std::ios::beg);
             assert(fileIn.good()&&dataStream.good());
             this->method = 0x0008u;
+            return _myDeflate(fileIn, level);
+            // return _zlibDeflate(fileIn, level);
+        }
+        int _myDeflate(std::ifstream &fileIn, int level) {
+            constexpr size_t chunk = 64*1024; //选择64kByte
+            utils::BitOutputStream bitstream{dataStream};
+            for (char buffer[chunk]; !fileIn.eof();) {
+                fileIn.read(buffer, sizeof(buffer));
+                utils::DeflateBlock block{buffer, fileIn.gcount(), fileIn.eof()};
+                bitstream << block;
+            }
+            bitstream.flush(); //所有块输出完才对齐。
+        }
+        int _zlibDeflate(std::ifstream &fileIn, int level) {
             // compress fileIn to dataStream using DEFLATE :
 
             //标志

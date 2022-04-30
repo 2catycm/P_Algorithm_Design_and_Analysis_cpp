@@ -28,11 +28,11 @@ target_link_libraries(GTestLab4B GTest::gmock GTest::gtest GTest::gmock_main GTe
 
 find_package(ZLIB REQUIRED)
 
-add_executable(ZipProjectTest cn/edu/SUSTech/YeCanming/Algs/Zip/BinaryIO.cpp 
-cn/edu/SUSTech/YeCanming/Algs/Zip/FileSystemTest.cpp 
-cn/edu/SUSTech/YeCanming/Algs/Zip/ZlibTest.cpp 
-cn/edu/SUSTech/YeCanming/Algs/Zip/EntityTest.cpp
-)
+add_executable(ZipProjectTest cn/edu/SUSTech/YeCanming/Algs/Zip/BinaryIO.cpp
+        cn/edu/SUSTech/YeCanming/Algs/Zip/FileSystemTest.cpp
+        cn/edu/SUSTech/YeCanming/Algs/Zip/ZlibTest.cpp
+        cn/edu/SUSTech/YeCanming/Algs/Zip/EntityTest.cpp
+        )
 target_link_libraries(ZipProjectTest ${GTEST_LIBRARIES})
 target_link_libraries(ZipProjectTest ZLIB::ZLIB)
 
@@ -40,3 +40,8 @@ add_executable(ZipUtilsTest cn/edu/SUSTech/YeCanming/Algs/Zip/ZipUtilsTest.cpp)
 target_link_libraries(ZipUtilsTest ${GTEST_LIBRARIES})
 target_link_libraries(ZipUtilsTest ZLIB::ZLIB)
 #target_link_libraries(BinaryIO GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
+
+add_executable(ZipAlgorithmTest cn/edu/SUSTech/YeCanming/Algs/Zip/Lz77Test.cpp cn/edu/SUSTech/YeCanming/Algs/Zip/RingQueueTest.cpp
+        cn/edu/SUSTech/YeCanming/Algs/Zip/BitOutputStreamTest.cpp)
+target_link_libraries(ZipAlgorithmTest ${GTEST_LIBRARIES})
+target_link_libraries(ZipAlgorithmTest ZLIB::ZLIB)

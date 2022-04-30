@@ -502,7 +502,7 @@ CentralDirectoryHeader 与 LocalHeader十分类似，主要的区别在于Centra
 
 EndOfCentralDirectoryHeader 需要CentralDirectoryHeader 开始的位置和字节数量，所以在开始转移CentralDirectoryHeader 流之前，我们需要把位置记录下来，把字节数量记录下来。这样就可以成功构造EndOfCentralDirectoryHeader  了。
 
-#### 3.0.3 ZIP压缩算法的主要逻辑
+#### 3.0.3 ZIP压缩格式的主要逻辑
 
 我们可以看到，上面的格式编排大概是对于要处理的每一个文件或者文件夹，进行一个单独的记录和数据写出，然后在文件最后再次记录它们的信息，不记录数据，最后进行简单的统计。这样设计的好处有：[^1]
 
@@ -547,7 +547,7 @@ EndOfCentralDirectoryHeader 需要CentralDirectoryHeader 开始的位置和字�
     - Len(C(B))/Len(B)称为压缩率
     - 如果C<sup>-1</sup>(C(B) = B, 则为无损压缩。
   - 可以保证对任何输入B，压缩率小于1的无损压缩算法称为**通用数据压缩算法**。
-  - 不存在通用数据压缩算法，即不存在能够减小任何比特流的算法[^4]
+  - 不存在通用数据压缩算法，即不存在能够减小任何比特流的算法[^4][^11]
     - 假设存在一种算法，可以对所有长度为1000的比特串B缩短。
     - 那么它的输出空间为长度为0,1,999的所有比特串，一共2<sup>0</sup>+...2<sup>999</sup> = 2<sup>1000</sup>-1种
     - 而长度为1000的比特串有2<sup>1000</sup>种，因此一定有无法还原成功。
@@ -572,7 +572,7 @@ EndOfCentralDirectoryHeader 需要CentralDirectoryHeader 开始的位置和字�
     - 一般采用前序遍历来保存前缀码树[^4], 实现是非常精巧的。
     - 所以哈夫曼编码仍然是这些前缀码当中最优的。
 
-#### 3.1.2 LZW算法与LZ77与DEFLATE
+#### 3.1.2 LZW、LZ77与DEFLATE算法原理
 
 LZW由Lempel，Ziv 和 Welch发明，它和Huffman一样适用于多种类型的文件。LZW 与Huffman思路截然不同, LZW算法的思想是**为输入中的变长模式生成一张定长的编码编译表**[^4]。
 
@@ -591,8 +591,49 @@ LZ77也是由Lempel和Ziv发明, LZW是LZ78的一个变种，而LZ78和LZ77是�
 
 DEFLATE是同时使用了LZ77算法和哈夫曼编码的无损数据压缩算法。[^1]
 
-- DEFLATE流有一系列等长数据块（除了最后一块不一样）组成，每一块有3bit的Header。
-- Header后面为数据。
+- 首先使用LZ77压缩数据，得到LZ77序列。
+- 然后通过哈夫曼树对序列进行编码，实现最后的编码。
+
+#### 3.1.3 DEFLATE算法实现细节
+
+##### 3.1.3.0 RFC DEFLATE 标准概述
+
+RFC是英文征求意见稿的缩写，是计算机科学中常用的发布互联网标准的一种非正式方法[^12]。在 RFC 1951（注意，1951是RFC的编号，而不是发表年份） [^11]中，DEFLATE算法被明确定义，并可以不用专利授权直接被使用[^13]。
+
+要理解这一篇RFC，我们可以从输入输出的要求入手，然后理解中间处理的流程，总结为下图：
+
+```mermaid
+graph TD;
+
+
+ S((压缩后/输出比特流开始))-->A0[从输入流读取一块解压后/输入序列]
+ A0-->A[开始输出新的压缩块]
+A-->B[压缩块头信息]
+B-->C[滑动窗口计算LZ77元素序列]
+C-->D{对LZ77元素序列进行哈夫曼编码分析}
+D--动态哈夫曼-->E[输出编码树]
+E-->F
+D--静态哈夫曼-->F[输出编码后的序列，不对齐而结束本压缩块]
+F-->G{输入流是否未结束?}
+G--是-->A
+G--否-->H[本文件的压缩后/输出比特流以字节对齐的方式结束]
+  
+```
+
+
+
+##### 3.1.3.1 如何输出比特流而非字节流？
+
+##### 3.1.3.2 LZ77滑动窗口时，如何、为什么要维护哈希值？
+
+维护哈希数组来实现寻找窗口的最大匹配是libdeflate的实现思路。要回答这个问题，首先我们要把LZ77算法生成LZ77元素序列的流程搞清楚。
+
+理解流程最好的办法就是用具体的例子。这里参考[^14]来做解释。
+
+- 假设要压缩 "Abcd abcd abcd abcd abcd" (没有空格)
+- 
+
+##### 3.1.3.3 如何把LZ77序列映射为静态哈夫曼码表？
 
 ### 3.2 C/C++ Language
 
@@ -613,7 +654,7 @@ char* buffer2 = &header;
 
 指针是对数据地址的记录，指针转换是对数据认知的改变。
 
-曾今会抱怨为什么memcpy，memcmp的第三个参数表示的是byte的数量，malloc的大小也是byte的数量，导致了我在用float、int数组的一些基本操作的时候，犯了没有乘sizeof(int), sizeof(float)的操作，其实是对计算机组成原理的认知不够。此时，C++的模板、类型推导似乎就非常高大上，让编程更加安全。当此时真正理解了C语言的设计逻辑在于对内存的标准操作之后，就能够理解在很多情况下，使用C语言的逻辑是更加自然的。
+曾经会抱怨为什么memcpy，memcmp的第三个参数表示的是byte的数量，malloc的大小也是byte的数量，导致了我在用float、int数组的一些基本操作的时候，犯了没有乘sizeof(int), sizeof(float)的操作，其实是对计算机组成原理的认知不够。此时，C++的模板、类型推导似乎就非常高大上，让编程更加安全。当此时真正理解了C语言的设计逻辑在于对内存的标准操作之后，就能够理解在很多情况下，使用C语言的逻辑是更加自然的。
 
 #### 3.2.1 本次Project中C++ 语言的巧用
 
@@ -695,4 +736,11 @@ You can see a copy of some of these references on [develop_doc]()
 [^8]: [Input/output library - cppreference.com](https://en.cppreference.com/w/cpp/io)
 [^9]: [Filesystem library - cppreference.com](https://en.cppreference.com/w/cpp/filesystem)
 [^10]: [LZ77 and LZ78 - Wikipedia](https://en.wikipedia.org/wiki/LZ77_and_LZ78)
+
+[^11]: [RFC 1951 - DEFLATE Compressed Data Format Specification version 1.3 (ietf.org)](https://datatracker.ietf.org/doc/html/rfc1951)
+
+[^12]: [征求意见 - 维基百科，自由的百科全书 (wikipedia.org)](https://en.wikipedia.org/wiki/Request_for_Comments)
+[^13]: [Deflate - Wikipedia](https://en.wikipedia.org/wiki/Deflate)
+[^14]: [An Explanation of the `Deflate' Algorithm (zlib.net)](http://zlib.net/feldspar.html)
+[^15]: https://github.com/ebiggers/libdeflate
 

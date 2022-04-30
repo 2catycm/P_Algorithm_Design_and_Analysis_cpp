@@ -42,7 +42,7 @@ uint64_t opt(){
     }
     return OPT(0, N-1);
 }
-int main(int argc, char const *argv[])
+int main()
 {
     std::ios::sync_with_stdio(false);
     size_t N;
