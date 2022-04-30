@@ -2,7 +2,7 @@
 // Created by 叶璨铭 on 2022/4/30.
 //
 #include "cn/edu/SUSTech/YeCanming/Judge/GTestExtensions.hpp"
-#include <cn/edu/SUSTech/YeCanming/Algs/Zip/utilities/LZ77.hpp>
+#include "cn/edu/SUSTech/YeCanming/Algs/Zip/utilities/LZ77.hpp"
 
 #include <gtest/gtest.h>
 namespace cn::edu::SUSTech::YeCanming::Algs::Zip {

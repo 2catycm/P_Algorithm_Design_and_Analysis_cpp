@@ -45,3 +45,10 @@ add_executable(ZipAlgorithmTest cn/edu/SUSTech/YeCanming/Algs/Zip/Lz77Test.cpp c
         cn/edu/SUSTech/YeCanming/Algs/Zip/BitOutputStreamTest.cpp)
 target_link_libraries(ZipAlgorithmTest ${GTEST_LIBRARIES})
 target_link_libraries(ZipAlgorithmTest ZLIB::ZLIB)
+
+add_executable(gen_lit_value_table cn/edu/SUSTech/YeCanming/Algs/Zip/gen_lit_value_table.cpp)
+
+
+add_executable(ZipAlgorithmTest2 cn/edu/SUSTech/YeCanming/Algs/Zip/DeflateBlockTest.cpp)
+target_link_libraries(ZipAlgorithmTest2 ${GTEST_LIBRARIES})
+target_link_libraries(ZipAlgorithmTest2 ZLIB::ZLIB)

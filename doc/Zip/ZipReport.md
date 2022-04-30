@@ -212,6 +212,46 @@ TEST(TestCentralDirectoryHeader, constructAndWrite){
 
 测试通过，说明CentralDirectoryHeader 字段与ZIP压缩软件生成的在二进制上完全一致。
 
+#### 2.0.3 LZ77算法实现的正确性
+
+```cpp
+TEST(ZipAlgorithm, Simple) {
+    char data[] = "Abcdabcdabcdabcd";//隐含了一个\0
+    const auto sequence = utils::lz77_compress(data, sizeof(data));
+    struct {
+        void operator()(utils::Lz77Literal const &lit) {
+            std::cout << "Lz77Literal{byte=" << lit.byte << "}" << std::endl;
+        }
+        void operator()(utils::Lz77Pointer const &ptr) {
+            std::cout << "Lz77Pointer{distance=" << ptr.distance << ", length=" << ptr.length << "}" << std::endl;
+        }
+    } visitor;
+    for (const auto &element : sequence) {
+        std::visit(visitor, element);
+    }
+    std::vector<utils::Lz77Element> verification =
+            {utils::Lz77Literal{'A'}, utils::Lz77Literal{'b'},
+             utils::Lz77Literal{'c'}, utils::Lz77Literal{'d'},
+             utils::Lz77Literal{'a'}, utils::Lz77Pointer{4,11},
+             utils::Lz77Literal{'\0'}};
+    EXPECT_EQ(verification, sequence);
+}
+```
+
+输出：
+
+```
+Lz77Literal{byte=A}
+Lz77Literal{byte=b}
+Lz77Literal{byte=c}
+Lz77Literal{byte=d}
+Lz77Literal{byte=a}
+Lz77Pointer{distance=4, length=11}
+Lz77Literal{byte= } 
+```
+
+测试Lz77算法对序列"Abcdabcdabcdabcd"的压缩效果，可以看到和手算的效果一样，测试通过。
+
 ### 2.1 系统测试
 
 > 3.0 中，我们确定了本Project一些基本功能组成部分是正常的、规范的。在3.1中，实际将一些文件夹、文件作为测试数据，用专业压缩软件检验本Project压缩得到的ZIP的效果，并与专业压缩软件的压缩结果作对比。
@@ -624,6 +664,10 @@ G--否-->H[本文件的压缩后/输出比特流以字节对齐的方式结束]
 
 ##### 3.1.3.1 如何输出比特流而非字节流？
 
+说来话长，这看起来是很简单的问题——通过移位、与或非等操作模拟即可。
+
+但是这里有一个还有几个C++概念——std::vector\<bool>，还有span。
+
 ##### 3.1.3.2 LZ77滑动窗口时，如何、为什么要维护哈希值？
 
 维护哈希数组来实现寻找窗口的最大匹配是libdeflate的实现思路。要回答这个问题，首先我们要把LZ77算法生成LZ77元素序列的流程搞清楚。
@@ -631,9 +675,83 @@ G--否-->H[本文件的压缩后/输出比特流以字节对齐的方式结束]
 理解流程最好的办法就是用具体的例子。这里参考[^14]来做解释。
 
 - 假设要压缩 "Abcd abcd abcd abcd abcd" (没有空格)
-- 
+- 当我们扫描完Abcda时，仍然在扫描指针的左边没有找到一样的。
+- 当遇到第二个小写b时，我们在左方的窗口中曾经发现过bcda，这与我们现在的bcda一致。
+- 这启发我们看看后面是不是也一样，果然，不止4个。
+
+
 
 ##### 3.1.3.3 如何把LZ77序列映射为静态哈夫曼码表？
+
+刚才我们提到，LZ77的输出结果实际上是LZ77元素（包括literal和\<distance, length\>对）的序列，并不是DEFLATE算法的最终结果。
+
+静态哈夫曼编码方法(fixed Huffman)是根据RFC约定的哈夫曼树进行编码的方式，可以避免存树的空间。而动态哈夫曼编码方法需要存树。
+
+但是请注意，**无论是静态哈夫曼还是动态哈夫曼，以下约定是一致的**[^11]
+
+- 使用code+extra bits 一同标识一个LZ77元素。
+
+- literal和length共享一棵树。
+
+  - 0..255标识literal字节
+
+  - 257..285标识length的code。（根据code的区间决定）
+
+    ![image-20220430195047038](ZipReport.assets/image-20220430195047038.png)
+
+  - 如上图所示，比如要编码的length为68, 首先找到区间代码277，然后因为extra bits有4位，可以区分区间中的16个数，所以68的extra bits 为 0001.
+
+- distance使用另外一颗code树。
+
+  - ![image-20220430195442221](ZipReport.assets/image-20220430195442221.png)
+  - 如图所示，比如要编码的distance为51，首先确定区间代码11， 然后得到额外标识位为0010. 
+
+- 解压软件读取到literal时，根据前缀码特性，不需要读distance；反之，读到length时，应该往下继续解码distance。
+
+  - 因此，上面distance的表code虽然与literal重复，但是可以通过length作为前缀区分出来。
+
+- 上面我们只是把LZ77元素转换为了\<code, extra bits>， **故事还没有结束**。
+
+- 上面我们说的是静态哈夫曼和动态哈夫曼共有的格式约定，**接下来把code，extra bits编码的方法才区分了静态和动态两种**。具体来说，静态哈夫曼是这样编码的：
+
+  - ![image-20220430195943064](ZipReport.assets/image-20220430195943064.png)
+  - 现在我们要把literal/length刚才的code(上图中的lit value)转换为上图中的codes，
+  - **distance的code则采用定长编码，长度为5。**
+  - 而extra bits不动。
+  - 这就是最后的编码。
+
+根据RFC文档和调试经验，有以下几点注意事项：[^11]
+
+- 256这个code有特殊含义，标识块结束。
+
+- code用小端序.
+
+- > The extra bits should be interpreted as a machine integer
+  >          stored with the most-significant bit first, e.g., bits 1110
+  >          represent the value 14.
+  
+	-  说明extra bits应该使用大端序。
+	
+- method用大端序。
+
+为了复用lib deflate库中的常量表，表示哈夫曼编码区间约定，我们还要解析一下其代码中这6个常量数组的含义。[^15]:
+
+- deflate_length_slot_base
+  - 表示第一张图(length编码表)中不同区间的起始元素。
+  - 一共有29个区间
+- deflate_extra_length_bits
+  - 表示第一张图(length编码表)中不同区间的所需的extra bits数量
+- deflate_offset_slot_base
+  - 表示第二张图(distance编码表)中不同区间的起始元素。
+  - 一共有30个区间
+- deflate_extra_offset_bits
+  - 表示第二张图(distance编码表)中不同区间的所需的extra bits数量
+- deflate_length_slot
+  - 表示第一张图(length编码表)中如何通过length计算其区间下标。
+  - 比如，长度4位于第1个区间，长度3位于第0个区间。
+- deflate_offset_slot
+  - 表示第二张图(distance编码表)中如何通过length计算其区间下标。
+  - 注意注释中的提示，distance太大的时候有规律，所以加一个公式来算。
 
 ### 3.2 C/C++ Language
 

@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <zlib.h>
 namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::Zip::entities;
@@ -102,10 +103,10 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
         }
         int _myDeflate(std::ifstream &fileIn, int level) {
             constexpr size_t chunk = 64*1024; //选择64kByte
-            utils::BitOutputStream bitstream{dataStream};
+            utils::BitOutputStream bitstream{&dataStream};
             for (char buffer[chunk]; !fileIn.eof();) {
                 fileIn.read(buffer, sizeof(buffer));
-                utils::DeflateBlock block{buffer, fileIn.gcount(), fileIn.eof()};
+                utils::DeflateBlock block{buffer, static_cast<size_t>(fileIn.gcount()), fileIn.eof()};
                 bitstream << block;
             }
             bitstream.flush(); //所有块输出完才对齐。
