@@ -1,38 +1,42 @@
-
 #include <array>
+#include <bitset>
 #include <iostream>
 #include <vector>
 
-// static std::array<std::vector<bool>, 301> possibleNumbersOfIntersections{{true}, {true}, {true, true}, {true, false, true, true}};
-// static std::array<std::vector<int>, 301> possibleNumbersOfIntersections{{1}, {1}, {1, 1}, {1, 0, 1, 1}, };
- static std::vector<int> possibleNumbersOfIntersections[301] {{1}, {1}, {1, 1}, {1, 0, 1, 1}, };
-//static std::vector<std::vector<int>> possibleNumbersOfIntersections{{1}, {1}, {1, 1}, {1, 0, 1, 1}};
-constexpr void solve() {
-    for (size_t i = 4; i <= 300; i++) {
-         auto &set = possibleNumbersOfIntersections[i];
-         set = std::vector<int>(i * (i - 1) / 2 + 1);
-//        std::vector<int> set(i * (i - 1) / 2 + 1);
+//constexpr size_t MaxN = 300;
+constexpr size_t MaxN = 20;
+constexpr size_t MaxLen = MaxN * (MaxN - 1) / 2 + 1;
+constexpr auto getPossibleNumbersOfIntersections() {
+    //    std::array<std::bitset<MaxLen>, MaxN+1> possibleNumbersOfIntersections{{{0b1}, {0b1}, {0b11}, {0b1101}, }};
+    std::array<std::array<bool, MaxLen>, MaxN + 1> possibleNumbersOfIntersections{{
+            {true},
+            {true},
+            {true, true},
+            {true, false, true, true},
+    }};
+    for (size_t i = 4; i <= MaxN; i++) {
+        auto &set = possibleNumbersOfIntersections[i];
         for (size_t j = i; j >= 1; --j) {
             const auto remaining = i - j;
             const auto &prev = possibleNumbersOfIntersections[remaining];
             const auto newIntersect = remaining * j;
-            for (size_t k = 0; k < prev.size(); k++) {
+            for (size_t k = 0; k < MaxLen; k++) {
                 if (prev[k])
-                    // set[k + newIntersect] = true;
-                    set[k + newIntersect] = 1;
+                    set[k + newIntersect] = true;
             }
+            //            set|=prev<<newIntersect;
         }
-//        possibleNumbersOfIntersections.push_back(set);
     }
+    return possibleNumbersOfIntersections;
 }
+constexpr auto possibleNumbersOfIntersections = getPossibleNumbersOfIntersections();
 int main() {
     int T, n;
     std::cin >> T;
-    solve();
     for (int i = 0; i < T; i++) {
         std::cin >> n;
-        auto result = possibleNumbersOfIntersections[n];
-        for (size_t j = 0; j < result.size(); j++) {
+        auto &result = possibleNumbersOfIntersections[n];
+        for (size_t j = 0; j < MaxLen; j++) {
             if (result[j])//读取std::vector<bool>没有坑。
                 std::cout << j << " ";
         }
