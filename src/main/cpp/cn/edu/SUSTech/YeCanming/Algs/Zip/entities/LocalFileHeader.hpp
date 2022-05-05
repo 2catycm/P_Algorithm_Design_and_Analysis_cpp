@@ -76,6 +76,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
                 this->crc32 = crc;
                 // 然后修改method，根据method压缩，进而更新compressedSize。
                 if (this->uncompressedSize <= 2048){
+//                if (this->uncompressedSize <= 0){
                     std::cout<<"[INFO]: file is too small to use DEFLATE, using STORE instead.  "<<std::endl;
                     storeFile(fileIn);
                 }
@@ -83,6 +84,8 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
                     std::cerr<<"[WARN]: DEFLATE method failed."<<std::endl;
                     std::cout<<"[INFO]: using STORE method instead. "<<std::endl;
                     storeFile(fileIn);
+                }else{
+                    std::cout<<"[INFO]: using DEFLATE method for "<<current_path.generic_string()<<"."<<std::endl;
                 }
             } else {
                 assert(stdfs::is_directory(current_path) || stdfs::file_size(current_path) == 0);//其他类型，比如symbolic link暂不处理。
@@ -110,6 +113,8 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::entities {
                 bitstream << block;
             }
             bitstream.flush(); //所有块输出完才对齐。
+            this->compressedSize = dataStream.tellp();
+            return Z_OK;
         }
         int _zlibDeflate(std::ifstream &fileIn, int level) {
             // compress fileIn to dataStream using DEFLATE :

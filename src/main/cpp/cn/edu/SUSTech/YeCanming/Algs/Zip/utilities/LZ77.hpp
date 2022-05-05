@@ -87,9 +87,12 @@ namespace cn::edu::SUSTech::YeCanming::Algs::Zip::utilities {
                     // 输出 distance + length
                     result.emplace_back(Lz77Pointer{distance, length});
                     // 更新字典
-                    hashWindow.push(current_hash);
-                    if (hashWindow.isFull()) {
-                        hashWindow.pop();
+                    for (size_t j = i; j < i+length; ++j) {
+                        current_hash = hash(buffer + j, 4);
+                        hashWindow.push(current_hash);
+                        if (hashWindow.isFull()) {
+                            hashWindow.pop();
+                        }
                     }
                     //跳指针
                     i += length;

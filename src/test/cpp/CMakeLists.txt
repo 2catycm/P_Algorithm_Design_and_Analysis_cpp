@@ -17,8 +17,11 @@ target_link_libraries(GTestBinarySearch GTest::gmock GTest::gtest GTest::gmock_m
 target_link_libraries(GTestBinarySearch ${Boost_LOG_LIBRARY})
 
 
-add_executable(Includer cn/edu/SUSTech/YeCanming/Includer/includer.cpp)
+add_executable(Includer cn/edu/SUSTech/YeCanming/Includer/includer_console.cpp)
 #target_link_libraries(Includer Boost::boost Boost::Log)
+add_executable(OJSubmissionGenerator cn/edu/SUSTech/YeCanming/Includer/OJSubmissionGenerator.cpp)
+target_link_libraries(OJSubmissionGenerator ${GTEST_LIBRARIES})
+
 
 add_executable(GTestVector cn/edu/SUSTech/YeCanming/cpplang/GTestVector.cpp cn/edu/SUSTech/YeCanming/cpplang/GTestLiterals.cpp cn/edu/SUSTech/YeCanming/cpplang/GTestCMemory.cpp)
 target_link_libraries(GTestVector GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
@@ -52,3 +55,7 @@ add_executable(gen_lit_value_table cn/edu/SUSTech/YeCanming/Algs/Zip/gen_lit_val
 add_executable(ZipAlgorithmTest2 cn/edu/SUSTech/YeCanming/Algs/Zip/DeflateBlockTest.cpp)
 target_link_libraries(ZipAlgorithmTest2 ${GTEST_LIBRARIES})
 target_link_libraries(ZipAlgorithmTest2 ZLIB::ZLIB)
+
+add_executable(TestLab8 cn/edu/SUSTech/YeCanming/Algs/lab8/TestLab8.cpp)
+target_link_libraries(TestLab8 ${GTEST_LIBRARIES})
+

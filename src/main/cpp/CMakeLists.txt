@@ -6,6 +6,11 @@ add_oj_submittable(Lab4ProblemA cn/edu/SUSTech/YeCanming/Algs/lab4 ProblemA_Post
 add_oj_submittable(Lab7ProblemB cn/edu/SUSTech/YeCanming/Algs/lab7 problemB)
 add_oj_submittable(Lab8ProblemA cn/edu/SUSTech/YeCanming/Algs/lab8 problemA)
 add_oj_submittable(Lab8ProblemB cn/edu/SUSTech/YeCanming/Algs/lab8 problemB)
+add_oj_submittable(CDQ_DC cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/CDQ PartialOrder3D)
+add_oj_submittable(CDQ_DC_Inversion1 cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/CDQ/inversion PartialOrder2D)
+add_oj_submittable(CDQ_DC_Inversion2 cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/CDQ/inversion MergeSortAndCnt)
+add_oj_submittable(DivideAndConquerStructBIT1 cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/Structure BIT1)
+add_oj_submittable(DivideAndConquerStructBIT2 cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/Structure BIT2)
 
 find_package(ZLIB REQUIRED)
 add_executable(ZipMain cn/edu/SUSTech/YeCanming/Algs/Zip/ZipMain.cpp)
