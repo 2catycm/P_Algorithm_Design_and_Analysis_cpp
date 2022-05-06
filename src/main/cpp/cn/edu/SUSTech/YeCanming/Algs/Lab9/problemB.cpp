@@ -43,12 +43,12 @@ size_t solve(const It first, const It last) {
     } else if (firstChar == '*') {
         //        auto solutionA = safeAdd(solve(first + 1, last - 1), 2),
         auto solutionA = safeAdd(solve(first, last - 1), 2),//默认匹配不牺牲*， 在里面的递归决议不匹配的时候才牺牲。
-                solutionB = solve(first + 1, last - 1);     // 牺牲*
+                solutionB = solve(first + 1, last);     // 牺牲*
         std::clog<<"Answer is the smallest among "<<solutionA<<", "<<solutionB<<std::endl;
         return answers[key] = std::min(solutionA, solutionB);
     } else if (lastChar == '*') {
         auto solutionA = safeAdd(solve(first+1, last), 2),//默认匹配不牺牲*， 在里面的递归决议不匹配的时候才牺牲。
-                solutionB = solve(first + 1, last - 1);     // 牺牲*
+                solutionB = solve(first, last - 1);     // 牺牲* 不匹配，但是左边还要。
         std::clog<<"Answer is the smallest among "<<solutionA<<", "<<solutionB<<std::endl;
         return answers[key] = std::min(solutionA, solutionB);
     } else {
