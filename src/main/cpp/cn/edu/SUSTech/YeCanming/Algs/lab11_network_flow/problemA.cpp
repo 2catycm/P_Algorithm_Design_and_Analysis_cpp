@@ -2,7 +2,7 @@
 // Created by 叶璨铭 on 2022/5/20.
 //
 #include <iostream>
-#include <list>
+#include <stack>
 #include <tuple>
 #include <vector>
 #include <queue>
@@ -39,13 +39,13 @@ public:
             // 1. 确保路径流量大于等于 allowCapacity
             // 2. 修改 residualGraph
             // 3. 增加总流量
-            std::queue<size_t> toBeVisit;
+            std::stack<size_t> toBeVisit;
             std::vector<bool> isVisited(vertexCnt+1);
             std::vector<size_t> parent(vertexCnt+1);
             toBeVisit.push(source);
             isVisited[source] = true;
             while (!toBeVisit.empty()){ //如果是从while的条件break的，就是没找到合适的路径，但是找到了所有source可达点的最短路径。
-                auto top = toBeVisit.front(); toBeVisit.pop();
+                auto top = toBeVisit.top(); toBeVisit.pop();
                 if (top==sink){
                     cannotFindPath = false;
                     break; //代表找到了最短路径。
