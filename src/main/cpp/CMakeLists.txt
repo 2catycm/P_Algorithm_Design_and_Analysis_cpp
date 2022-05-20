@@ -15,6 +15,7 @@ add_oj_submittable(DivideAndConquerStructBIT2 cn/edu/SUSTech/YeCanming/Algs/Divi
 add_oj_submittable(B3624 cn/edu/SUSTech/YeCanming/Algs/DynamicProgramming B3624_cat_food)
 add_oj_submittable(Lab9A cn/edu/SUSTech/YeCanming/Algs/lab9 problemA)
 add_oj_submittable(Lab9B cn/edu/SUSTech/YeCanming/Algs/lab9 problemB)
+add_oj_submittable(Lab10A cn/edu/SUSTech/YeCanming/Algs/lab10 problemA)
 
 find_package(ZLIB REQUIRED)
 add_executable(ZipMain cn/edu/SUSTech/YeCanming/Algs/Zip/ZipMain.cpp)
