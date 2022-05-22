@@ -12,7 +12,7 @@
 #define DEBUG true
 #define MyLog if(DEBUG)\
                 std::clog
-template<class Capacity = size_t>
+template<class Capacity = uint64_t>
 class FlowNetwork {
     static constexpr Capacity CapacityInf = std::numeric_limits<Capacity>::max();
     struct Edge{
@@ -20,7 +20,7 @@ class FlowNetwork {
         Capacity cap, flow;
     };
     std::vector<Edge> mEdges; // from, to, weight
-    std::vector<std::forward_list<typename decltype(mEdges)::iterator>> mAdjacencyList;
+    std::vector<std::forward_list<size_t>> mAdjacencyList;
 public:
     const size_t vertexCnt, edgeCnt;
     size_t source, sink;
@@ -30,14 +30,13 @@ public:
     }
     void addEdge(size_t vertexU, size_t vertexV, Capacity capacity){
         mEdges.push_back({vertexU, vertexV, capacity, 0});
-        mAdjacencyList[vertexU].emplace_front(mEdges.end()-1);
+        mAdjacencyList[vertexU].emplace_front(mEdges.size()-1);
         mEdges.push_back({vertexV, vertexU, 0, 0});
-        mAdjacencyList[vertexV].emplace_front(mEdges.end()-1);
+        mAdjacencyList[vertexV].emplace_front(mEdges.size()-1);
     }
     Capacity getMaximumFlow(){
         MyLog<<"Calculating maximum flow. "<<std::endl;
         Capacity maximumFlow{0};
-        auto residualGraph = mAdjacencyList;
         auto allowCapacity = std::numeric_limits<Capacity>::max()>>31;
         for (; allowCapacity>0; ){
             MyLog<<"\tTrying to find an augmenting path with at least "<<allowCapacity<<std::endl;
@@ -47,21 +46,22 @@ public:
             // 3. 增加总流量
             std::queue<size_t> toBeVisited;
             std::vector<Capacity> bottlenecks(vertexCnt+1);
-            std::vector<typename decltype(mEdges)::iterator> parent(vertexCnt+1); //放得是edge类型的，表示一条边
+            std::vector<size_t> parent(vertexCnt+1); //放得是edge类型的，表示一条边
             toBeVisited.emplace(source);
             bottlenecks[source] = CapacityInf;
             while (!toBeVisited.empty()){ //如果是从while的条件break的，就是没找到合适的路径，但是找到了所有source可达点的最短路径。
                 auto top = toBeVisited.front();
                 toBeVisited.pop();
                 MyLog<<"\t\tbfs finds vertex "<<top<<std::endl;
-                for (const auto& edge:mAdjacencyList[top]) { //遍历连接的所有边。
-                    MyLog<<"\t\t\tit has neighbour vertex "<<edge->to<<std::endl;
-                    auto residualCap = edge->cap-edge->flow;
-                    if (bottlenecks[edge->to]==0 && residualCap>=allowCapacity){
-                        parent[edge->to] = edge;
-                        bottlenecks[edge->to] = std::min(bottlenecks[top], residualCap);
-                        MyLog<<"\t\t\tbottleneck becomes "<<bottlenecks[edge->to]<<std::endl;
-                        toBeVisited.emplace(edge->to);
+                for (const auto& _edge:mAdjacencyList[top]) { //遍历连接的所有边。
+                    auto& edge = mEdges[_edge];
+                    MyLog<<"\t\t\tit has neighbour vertex "<<edge.to<<std::endl;
+                    auto residualCap = edge.cap-edge.flow;
+                    if (bottlenecks[edge.to]==0 && residualCap>=allowCapacity){
+                        parent[edge.to] = _edge;
+                        bottlenecks[edge.to] = std::min(bottlenecks[top], residualCap);
+                        MyLog<<"\t\t\tbottleneck becomes "<<bottlenecks[edge.to]<<std::endl;
+                        toBeVisited.emplace(edge.to);
                     }
                 }
                 if (bottlenecks[sink]!=0)
@@ -71,10 +71,11 @@ public:
                 MyLog<<"\t\tbfs finds a path. "<<std::endl;
                 auto bottleNeck = bottlenecks[sink];
                 MyLog<<"\t\tthe bottleneck of this path is "<<bottleNeck<<std::endl;
-                for (size_t it=sink; it!=source; it = parent[it]->from){
+                for (size_t it=sink; it!=source; it = mEdges[parent[it]].from){
                     assert(it!=0);
-                    size_t num = std::distance(mEdges.begin(), parent[it]);
+                    size_t num = parent[it];
                     MyLog<<"\t\t\t"<<it<<" is on the path. "<<std::endl;
+                    MyLog<<"\t\t\t"<<"its edge number is "<<num<<std::endl;
                     mEdges[num].flow += bottleNeck;
                     mEdges[num^1].flow -= bottleNeck;
                 }
