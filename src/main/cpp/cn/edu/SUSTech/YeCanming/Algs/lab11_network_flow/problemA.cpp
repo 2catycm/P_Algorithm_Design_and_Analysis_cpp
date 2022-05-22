@@ -2,88 +2,86 @@
 // Created by 叶璨铭 on 2022/5/20.
 //
 #include <iostream>
-#include <stack>
-#include <tuple>
-#include <vector>
-#include <unordered_set>
-#include <queue>
-#include <cstdint>
-#include <limits>
+#include <list>
+#include <forward_list>
 #include <cassert>
-#define Square(X) ((X)*(X))
-
+#include <tuple>
+#include <queue>
+#include <vector>
+#include <limits>
+#define DEBUG true
+#define MyLog if(DEBUG)\
+                std::clog
 template<class Capacity = size_t>
 class FlowNetwork {
-    std::vector<Capacity> mAdjacencyMatrix; //如果N是100， 矩阵可能有10000那么大。
-    std::vector<std::unordered_set<size_t>> mAdjacencyList; //用于加速bfs。
-    size_t mEdgeCnt{0};
+    static constexpr Capacity CapacityInf = std::numeric_limits<Capacity>::max();
+    struct Edge{
+        size_t from, to;
+        Capacity cap, flow;
+    };
+    std::vector<Edge> mEdges; // from, to, weight
+    std::vector<std::forward_list<typename decltype(mEdges)::iterator>> mAdjacencyList;
 public:
-    const size_t vertexCnt;
-#define CapacityFromIToJ(adjMat, i, j) adjMat[vertexCnt*(i)+(j)]
+    const size_t vertexCnt, edgeCnt;
     size_t source, sink;
-    explicit FlowNetwork(size_t vertexCnt, size_t source=0, size_t sink=0)
-        : vertexCnt(vertexCnt), source(source), sink(sink), mAdjacencyMatrix(Square(vertexCnt + 1)), mAdjacencyList(vertexCnt+1) {
+    explicit FlowNetwork(size_t vertexCnt, size_t edgeCnt, size_t source=0, size_t sink=0)
+        : vertexCnt(vertexCnt), edgeCnt(edgeCnt), source(source), sink(sink), mAdjacencyList(vertexCnt + 1) {
+        mEdges.reserve(edgeCnt);
     }
     void addEdge(size_t vertexU, size_t vertexV, Capacity capacity){
-        CapacityFromIToJ(mAdjacencyMatrix, vertexU, vertexV)+=capacity;
-        mAdjacencyList[vertexU].emplace(vertexV);
-        ++mEdgeCnt;
-    }
-    [[nodiscard]] size_t getEdgeCnt() const {
-        return mEdgeCnt;
+        mEdges.push_back({vertexU, vertexV, capacity, 0});
+        mAdjacencyList[vertexU].emplace_front(mEdges.end()-1);
+        mEdges.push_back({vertexV, vertexU, 0, 0});
+        mAdjacencyList[vertexV].emplace_front(mEdges.end()-1);
     }
     Capacity getMaximumFlow(){
+        MyLog<<"Calculating maximum flow. "<<std::endl;
         Capacity maximumFlow{0};
-        auto residualGraphMat = mAdjacencyMatrix;
-        auto residualGraphList = mAdjacencyList;
+        auto residualGraph = mAdjacencyList;
         auto allowCapacity = std::numeric_limits<Capacity>::max()>>31;
         for (; allowCapacity>0; ){
-            bool cannotFindPath = true;
+            MyLog<<"\tTrying to find an augmenting path with at least "<<allowCapacity<<std::endl;
             //对 residualGraph 做一次bfs，找到src到sink路径的同时
             // 1. 确保路径流量大于等于 allowCapacity
             // 2. 修改 residualGraph
             // 3. 增加总流量
-            std::stack<size_t> toBeVisit;
-            std::vector<bool> isVisited(vertexCnt+1);
-            std::vector<size_t> parent(vertexCnt+1);
-            toBeVisit.push(source);
-            isVisited[source] = true;
-            while (!toBeVisit.empty()){ //如果是从while的条件break的，就是没找到合适的路径，但是找到了所有source可达点的最短路径。
-                auto top = toBeVisit.top(); toBeVisit.pop();
-                if (top==sink){
-                    cannotFindPath = false;
-                    break; //代表找到了最短路径。
-                }
-//                for (int j = 1; j <= vertexCnt; ++j) { //遍历连接的所有边。
-                for (const auto& relative:mAdjacencyList[top]) { //遍历连接的所有边。
-                    if (!isVisited[relative] && CapacityFromIToJ(residualGraphMat, top, relative)>=allowCapacity){
-                        isVisited[top] = true;//写在这里而不是pop后面，这样就可以防止后面队列太大。
-                        parent[relative] = top; //上面那个isVisited很重要，保证了parent不会被人乱改。parent始终是记录最短路径的。
-                        toBeVisit.push(relative);
+            std::queue<size_t> toBeVisited;
+            std::vector<Capacity> bottlenecks(vertexCnt+1);
+            std::vector<typename decltype(mEdges)::iterator> parent(vertexCnt+1); //放得是edge类型的，表示一条边
+            toBeVisited.emplace(source);
+            bottlenecks[source] = CapacityInf;
+            while (!toBeVisited.empty()){ //如果是从while的条件break的，就是没找到合适的路径，但是找到了所有source可达点的最短路径。
+                auto top = toBeVisited.front();
+                toBeVisited.pop();
+                MyLog<<"\t\tbfs finds vertex "<<top<<std::endl;
+                for (const auto& edge:mAdjacencyList[top]) { //遍历连接的所有边。
+                    MyLog<<"\t\t\tit has neighbour vertex "<<edge->to<<std::endl;
+                    auto residualCap = edge->cap-edge->flow;
+                    if (bottlenecks[edge->to]==0 && residualCap>=allowCapacity){
+                        parent[edge->to] = edge;
+                        bottlenecks[edge->to] = std::min(bottlenecks[top], residualCap);
+                        MyLog<<"\t\t\tbottleneck becomes "<<bottlenecks[edge->to]<<std::endl;
+                        toBeVisited.emplace(edge->to);
                     }
                 }
+                if (bottlenecks[sink]!=0)
+                    break;
             }
-            if (!cannotFindPath){
-                Capacity bottleNeck{std::numeric_limits<Capacity>::max()};
-                for (size_t it=sink; it!=source; it = parent[it]){
+            if (bottlenecks[sink]!=0){
+                MyLog<<"\t\tbfs finds a path. "<<std::endl;
+                auto bottleNeck = bottlenecks[sink];
+                MyLog<<"\t\tthe bottleneck of this path is "<<bottleNeck<<std::endl;
+                for (size_t it=sink; it!=source; it = parent[it]->from){
                     assert(it!=0);
-                    bottleNeck = std::min(bottleNeck, CapacityFromIToJ(residualGraphMat, parent[it], it));
-                }
-                assert(bottleNeck!=0);
-                for (size_t it=sink; it!=source; it = parent[it]){
-                    assert(it!=0);
-                    auto& edge = CapacityFromIToJ(residualGraphMat, parent[it], it);
-                    auto& reverseEdge = CapacityFromIToJ(residualGraphMat, it, parent[it]);
-                    if (reverseEdge==0)
-                        residualGraphList[it].emplace(parent[it]);
-                    reverseEdge+=bottleNeck;
-                    edge-=bottleNeck;
-//                    if (edge==0)
-//                        residualGraphList[parent[it]].erase(it);
+                    size_t num = std::distance(mEdges.begin(), parent[it]);
+                    MyLog<<"\t\t\t"<<it<<" is on the path. "<<std::endl;
+                    mEdges[num].flow += bottleNeck;
+                    mEdges[num^1].flow -= bottleNeck;
                 }
                 maximumFlow+=bottleNeck;
             }else{
-                allowCapacity>>=cannotFindPath; //如果找不到路径，就降低要求。比如如果要求是1，一直找得到，就不会降，最后找不到了变成0，算法结束。
+                MyLog<<"\t\tbfs finds no path. "<<std::endl;
+                allowCapacity>>=1; //如果找不到路径，就降低要求。比如如果要求是1，一直找得到，就不会降，最后找不到了变成0，算法结束。
             }
         }
         return maximumFlow;
@@ -92,9 +90,9 @@ public:
 int main() {
     size_t N, M, S, T;
     std::cin >> N >> M >> S >> T;
-    FlowNetwork<uint64_t> flowNetwork{N, S, T};
+    FlowNetwork flowNetwork{N, M, S, T};
     for (int i = 0; i < M; ++i) {
-        size_t u, v; uint64_t c;
+        int u, v, c;
         std::cin>>u>>v>>c;
         flowNetwork.addEdge(u, v, c);
     }
