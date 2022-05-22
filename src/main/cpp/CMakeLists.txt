@@ -17,6 +17,7 @@ add_oj_submittable(Lab9A cn/edu/SUSTech/YeCanming/Algs/lab9 problemA)
 add_oj_submittable(Lab9B cn/edu/SUSTech/YeCanming/Algs/lab9 problemB)
 add_oj_submittable(Lab10A cn/edu/SUSTech/YeCanming/Algs/lab10 problemA)
 add_oj_submittable(Lab11A cn/edu/SUSTech/YeCanming/Algs/lab11_network_flow problemA)
+add_oj_submittable(Lab11B cn/edu/SUSTech/YeCanming/Algs/lab11_network_flow problemB)
 
 find_package(ZLIB REQUIRED)
 add_executable(ZipMain cn/edu/SUSTech/YeCanming/Algs/Zip/ZipMain.cpp)
