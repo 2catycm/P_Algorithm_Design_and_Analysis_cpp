@@ -15,6 +15,7 @@
                 std::clog
 template<class Capacity = uint64_t>
 class FlowNetwork {
+protected:
     static constexpr Capacity CapacityInf = std::numeric_limits<Capacity>::max();
     struct Edge {
         size_t from, to;
@@ -36,7 +37,18 @@ public:
         mEdges.push_back({vertexV, vertexU, 0, 0});
         mAdjacencyList[vertexV].emplace_back(mEdges.size()-1);
     }
-    Capacity getMaximumFlow() {
+    bool increaseEdge(size_t vertexU, size_t vertexV, Capacity increment){
+        for (const auto& _edgeIndex:mAdjacencyList[vertexU]){
+            auto& edge = mEdges[_edgeIndex];
+            if (edge.to==vertexV){
+                edge.cap+=increment;
+                return true;
+            }
+        }
+        addEdge(vertexU, vertexV, increment);
+        return false;
+    }
+    virtual Capacity getMaximumFlow() {
         MyLog << "Calculating maximum flow. " << std::endl;
         Capacity maximumFlow{0};
         while (bfs()){
@@ -48,7 +60,7 @@ public:
         return maximumFlow;
     }
 
-private:
+protected:
     std::vector<size_t> mValidRoute; // 表示"当前弧优化" 的边的索引。
     /**
      * build or rebuild the depth array.

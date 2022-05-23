@@ -33,6 +33,7 @@
     }
 Submit(DivideAndConquer, "cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/Structure", BIT1);
 Submit(DivideAndConquer, "cn/edu/SUSTech/YeCanming/Algs/DivideAndConquer/Structure", BIT2);
+Submit(lab11_network_flow, "cn/edu/SUSTech/YeCanming/Algs/lab11_network_flow", problemB);
 
 
 int main(int argc, char *argv[]) {
