@@ -18,6 +18,13 @@
 #include <algorithm>
 namespace cn::edu::SUSTech::YeCanming::Algs::lab12 {
     namespace ThisPackage = cn::edu::SUSTech::YeCanming::Algs::lab12;
+    constexpr auto negativeInf = std::numeric_limits<int64_t>::min();
+    constexpr int64_t safeAdd(const int64_t& a, const int64_t& b){
+        if (a==negativeInf || b==negativeInf)
+            return negativeInf;
+        else
+            return a+b;
+    }
     template<class InputIt, class T, class BinaryOperation>
     constexpr // since C++20
     T accumulate(InputIt first, InputIt last, T init, BinaryOperation op){
@@ -28,43 +35,55 @@ namespace cn::edu::SUSTech::YeCanming::Algs::lab12 {
     }
 
     struct Word{
-        size_t length{0}; //[1, 1000]
+        int length{0}; //[1, 1000]
         int elegance{0}; // same range as int
     };
     /**
      * 输入一个word的集合，给定容量限制。
      * 输出这个集合的最大优雅程度。
+     * 其中，允许了 -capacity 到 +capacity 的容量限制，允许负的权重
      */
     template <class It>
-    int64_t knapsack01(It first, It last, uint64_t capacity){
+    auto _knapsack01(It first, It last, uint64_t capacity){
         const auto size = std::distance(first, last);
-        std::vector<int64_t> opt(capacity+1);
-        std::fill(opt.begin(),  opt.end(), std::numeric_limits<decltype(opt)::value_type>::min());
-        opt[0] = 0; // 容量为0的时候，目前已知最大优雅度是0.
+        std::vector<int64_t> opt(2*capacity+1);
+        std::fill(opt.begin(),  opt.end(), negativeInf);
+
+        opt[capacity] = 0; // 容量为0的时候，目前已知最大优雅度是0.
         for (;first!=last; ++first) {
             auto& word = first[0];
-            for (int64_t j = int64_t(opt.size())-1; j >=0 ; --j) { //倒过来求，就可以避免读取了修改过的值。
-                if (word.length > j)
-                    continue;
-                //可以选择加上这个word，或者不加。
-                opt[j] = std::max(opt[j], opt[j -word.length]+word.elegance);
+            auto& wordLength = word.length;
+            if (wordLength > 0){
+                for (int64_t j = int64_t(opt.size())-1; j >=wordLength; --j) { //倒过来求，就可以避免读取了修改过的值。 否则是错的，多次使用了同一个物品。
+                    //可以选择加上这个word，或者不加。
+                    opt[j] = std::max(opt[j], safeAdd(opt[j -word.length], word.elegance));
+                }
+            }else if (wordLength<0){
+                for (int64_t j = 0; j < opt.size()+wordLength; ++j) {
+                    //可以选择加上这个word，或者不加。
+                    opt[j] = std::max(opt[j], safeAdd(opt[j -word.length], word.elegance));
+                }
             }
         }
-        return opt[capacity];
+        return opt;
     }
     template <class It>
-    int64_t bruteForceSolve(It seaFloweryFirst, It fluffyBunnyFirst, It fluffyBunnyLast) {
-        auto adder = [](const uint64_t& a, const Word& b){return a+b.length;};
-        uint64_t lengthSum1 = ThisPackage::accumulate(seaFloweryFirst, fluffyBunnyFirst, uint64_t(0), adder);
-        uint64_t lengthSum2 = ThisPackage::accumulate(fluffyBunnyFirst, fluffyBunnyLast, uint64_t(0), adder);
-        auto maximumLength = std::max(lengthSum1, lengthSum2);
-        auto bestResult = std::numeric_limits<int64_t>::min();
-        for (int i = 0; i < maximumLength; ++i) {
-            bestResult = std::max(bestResult,
-                knapsack01(seaFloweryFirst, fluffyBunnyFirst, i)+
-                knapsack01(fluffyBunnyFirst, fluffyBunnyLast, i));
+    int64_t goodSolve(It seaFloweryFirst, It fluffyBunnyFirst, It fluffyBunnyLast){
+        auto maxer = [](const int& a, const Word& b){return std::max(a, b.length);};
+        int lengthSum1 = ThisPackage::accumulate(seaFloweryFirst, fluffyBunnyFirst, uint64_t(0), maxer);
+        int lengthSum2 = ThisPackage::accumulate(fluffyBunnyFirst, fluffyBunnyLast, uint64_t(0), maxer);
+        auto maximumLength = std::max(lengthSum1, -lengthSum2);
+        int threeSigma = 3* 2*maximumLength * 2*std::sqrt(std::distance(seaFloweryFirst, fluffyBunnyLast) / 12);
+        threeSigma/=2;
+        assert(threeSigma>=0);
+        for (It it = fluffyBunnyFirst; it!=fluffyBunnyLast; ++it){
+            it->length *=-1;
         }
-        return bestResult;
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(seaFloweryFirst, fluffyBunnyLast, g);
+        auto opt = _knapsack01(seaFloweryFirst, fluffyBunnyLast, threeSigma);
+        return opt[threeSigma];
     }
 }
 using namespace cn::edu::SUSTech::YeCanming::Algs::lab12;
@@ -77,7 +96,8 @@ int main(){
         std::vector<Word> words(N+M);
         for (auto&& w:words)
             std::cin>>w.length>>w.elegance;
-        std::cout<< bruteForceSolve(words.begin(), words.begin()+N, words.end())<<std::endl;
+        std::cout<< goodSolve(words.begin(), words.begin()+N, words.end())<<std::endl;
+
     }
     return 0;
 }
