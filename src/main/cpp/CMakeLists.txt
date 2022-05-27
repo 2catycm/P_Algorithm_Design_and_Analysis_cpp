@@ -18,6 +18,8 @@ add_oj_submittable(Lab9B cn/edu/SUSTech/YeCanming/Algs/lab9 problemB)
 add_oj_submittable(Lab10A cn/edu/SUSTech/YeCanming/Algs/lab10 problemA)
 add_oj_submittable(Lab11A cn/edu/SUSTech/YeCanming/Algs/lab11_network_flow problemA)
 add_oj_submittable(Lab11B cn/edu/SUSTech/YeCanming/Algs/lab11_network_flow problemB)
+add_oj_submittable(Lab12A cn/edu/SUSTech/YeCanming/Algs/lab12_random_algorithm problemA)
+add_oj_submittable(Lab12B cn/edu/SUSTech/YeCanming/Algs/lab12_random_algorithm problemB)
 
 find_package(ZLIB REQUIRED)
 add_executable(ZipMain cn/edu/SUSTech/YeCanming/Algs/Zip/ZipMain.cpp)

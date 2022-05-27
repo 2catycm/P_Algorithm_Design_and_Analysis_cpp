@@ -71,7 +71,7 @@ size_t solveIteratively(const It first, const It last) {
 #define OPT(i, j) opt[(i) * (N + 1) + (j)]
     for (int i = 1; i <= N; ++i) {        // i是区间长度。
         for (int j = 0; j + i <= N; ++j) {//j+i是end，可以到N
-            std::clog << "solve[" << j << ", " << j + i << ")" << std::endl;
+            std::clog << "bruteForceSolve[" << j << ", " << j + i << ")" << std::endl;
             if (i == 1) {
                 OPT(j, j+i) = first[j] == '*' ? 0 : 1;
             } else {

@@ -1,10 +1,12 @@
 //
 // Created by 叶璨铭 on 2022/5/22.
 //
-//And then you ask
-//"Do you wanna dance, my barefoot cinderella?
-// Don't need no slippers or party dress,
-// the way you're lookin' right now is what I like the best."
+/**
+ And then you ask
+    "Do you wanna dance, my barefoot cinderella?
+     Don't need no slippers or party dress,
+     the way you're lookin' right now is what I like the best."
+ */
 #include "DinicFlowNetwork.h"
 //#include "EdmondsKarpFlowNetwork.h"
 
@@ -54,8 +56,8 @@ public:
         MyLog << "Adding loveline " << studentX << " loves " << studentY << ", with depression (a,b)=(" << depressionA << ", " << depressionB << ")" << std::endl;
         MyLog << "\taddEdge(" << studentY << ", " << getPairNodeFromStudent(studentX) << ", " << depressionA << ") for a. " << std::endl;
         this->addEdge(studentY, getPairNodeFromStudent(studentX), depressionA);
-        MyLog << "\taddEdge(" << studentX << ", " << getPairNodeFromStudent(studentY) << ", " << depressionB << ") for b. " << std::endl;
-        this->addEdge(studentX, getPairNodeFromStudent(studentY), depressionB);
+        MyLog << "\taddEdge(" << getPairNodeFromStudent(studentY) << ", " << studentX << ", " << depressionB << ") for b. " << std::endl;
+        this->addEdge(getPairNodeFromStudent(studentY), studentX, depressionB);
     }
     Capacity getMaximumFlow() override {
         return FlowNetwork<Capacity>::getMaximumFlow() - 2 * N * veryBigConstant;
