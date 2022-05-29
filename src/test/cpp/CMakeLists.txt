@@ -59,3 +59,6 @@ target_link_libraries(ZipAlgorithmTest2 ZLIB::ZLIB)
 add_executable(TestLab8 cn/edu/SUSTech/YeCanming/Algs/lab8/TestLab8.cpp)
 target_link_libraries(TestLab8 ${GTEST_LIBRARIES})
 
+add_executable(TestLab12 cn/edu/SUSTech/YeCanming/Algs/lab12/TestLab12.cpp)
+target_link_libraries(TestLab12 ${GTEST_LIBRARIES})
+

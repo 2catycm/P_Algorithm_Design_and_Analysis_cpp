@@ -59,7 +59,7 @@ namespace cn::edu::SUSTech::YeCanming::Algs::lab12 {
                     opt[j] = std::max(opt[j], safeAdd(opt[j -word.length], word.elegance));
                 }
             }else if (wordLength<0){
-                for (int64_t j = 0; j < opt.size()+wordLength; ++j) {
+                for (int64_t j = 0; j < int64_t(opt.size())+wordLength; ++j) {
                     //可以选择加上这个word，或者不加。
                     opt[j] = std::max(opt[j], safeAdd(opt[j -word.length], word.elegance));
                 }
@@ -73,8 +73,9 @@ namespace cn::edu::SUSTech::YeCanming::Algs::lab12 {
         int lengthSum1 = ThisPackage::accumulate(seaFloweryFirst, fluffyBunnyFirst, uint64_t(0), maxer);
         int lengthSum2 = ThisPackage::accumulate(fluffyBunnyFirst, fluffyBunnyLast, uint64_t(0), maxer);
         auto maximumLength = std::max(lengthSum1, -lengthSum2);
-        int threeSigma = 3* 2*maximumLength * 2*std::sqrt(std::distance(seaFloweryFirst, fluffyBunnyLast) / 12);
+        int threeSigma = 3* 2*maximumLength * 2*std::sqrt(std::distance(seaFloweryFirst, fluffyBunnyLast) / 12.0);
         threeSigma/=2;
+//        threeSigma+=3;
         assert(threeSigma>=0);
         for (It it = fluffyBunnyFirst; it!=fluffyBunnyLast; ++it){
             it->length *=-1;

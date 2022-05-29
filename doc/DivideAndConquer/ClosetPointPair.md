@@ -31,7 +31,7 @@ What happens if new points are being added continuously? Given a sequence of k-d
 
 ### 0.2 Applications of the algorithms for this problem
 
-Knowing the closest point pair is important to solve problems in  graphics, computer vision, pattern recognition, clustering, geographical, information systems, molecular modeling, geometric problems and numerous matching problems[^4].
+Knowing the closest point pair is important to bruteForceSolve problems in  graphics, computer vision, pattern recognition, clustering, geographical, information systems, molecular modeling, geometric problems and numerous matching problems[^4].
 
 For more concrete examples, ships sailing in the sea and aircrafts flying on the sky can be treated as points in 2d and 3d space. To avoid collision, the traffic control system uses the algorithm to find the most likely vessels or planes to be met[^5]. 
 
@@ -44,7 +44,7 @@ The following problems looks similar to the closest point pairt problem, but are
 
 > *Given* *N* *points* *in* *the Euclidean* plane, *find* *the* *nearest* *neighbor* *of* ***each**.* [^3]
 
-​	The input P is the same, but this problems requires n points as output O, each one O<sub>i</sub> representing that the nearest neighbour of P<sub>i</sub> . By 1975, no algorithm has yet been found to solve this problem.[^3]  However, Shamosand Hoey designed a good algorithm which can construct the Voronoi diagram in  O(NlogN) time to solve it[^3]. The constants are too big to let it efficient[^4]. But I think the online version of closest point pair problem can solve this with smaller constants.  //TODO demand more research.
+​	The input P is the same, but this problems requires n points as output O, each one O<sub>i</sub> representing that the nearest neighbour of P<sub>i</sub> . By 1975, no algorithm has yet been found to bruteForceSolve this problem.[^3]  However, Shamosand Hoey designed a good algorithm which can construct the Voronoi diagram in  O(NlogN) time to bruteForceSolve it[^3]. The constants are too big to let it efficient[^4]. But I think the online version of closest point pair problem can bruteForceSolve this with smaller constants.  //TODO demand more research.
 
 - K-nearest neighbour in machine learning
 - K-clustering in machine learning
@@ -65,7 +65,7 @@ A method called reduction is used.
 
   It is well known that element uniqueness problem has a lower bound of nlogn (determinstic algorithm)[^3][^4]. This is a typical contribution from the decision tree model. 
 
-- Finally, we can solve the element uniqueness problem by solving the closest point pair problem. If we found the closest distance is 0, then their exists non-unique element, indicating the lower bound of closest point problem, no matter what the dimension k is, is NlogN[^4]. 
+- Finally, we can bruteForceSolve the element uniqueness problem by solving the closest point pair problem. If we found the closest distance is 0, then their exists non-unique element, indicating the lower bound of closest point problem, no matter what the dimension k is, is NlogN[^4]. 
 - Moreover, the "all cloest point problem" mentioned earlier also has the same lower bound[^3].
 
 On the other hand, the upper bound is quite easy to see. By enumerating the all C<sup>2</sup><sub>n</sub> pairs, we got an θ(N<sup>2</sup>) algorithm. 
@@ -148,7 +148,7 @@ template<typename T, size_t K, typename It = typename std::vector<std::array<T, 
 
 It looks intimidating with inctricate templates, but don't worry.  Let's look at a client example. 
 
-The function desired a range of a points in a vector. For example, we only want to find the closest point pair among the third element, we can use pass v.cbegin()+2 and v.cend() as the argument. This follows the convention of C++ algortihm lib in header \<algorithm\>. The benefit for this convention is that you can solve the problem on the input that you are really interterst. Moreover, it is easy to articulate divide and conquer algorithms or recursive algorithms using iterators to specify the range. 
+The function desired a range of a points in a vector. For example, we only want to find the closest point pair among the third element, we can use pass v.cbegin()+2 and v.cend() as the argument. This follows the convention of C++ algortihm lib in header \<algorithm\>. The benefit for this convention is that you can bruteForceSolve the problem on the input that you are really interterst. Moreover, it is easy to articulate divide and conquer algorithms or recursive algorithms using iterators to specify the range. 
 
 ```cpp
 void testClosestPointND(){
@@ -233,7 +233,7 @@ Typical wrong code example: closest-pair-3d library written by eyny[^11]
 
 If you divide the problem like him, when you occur input points with same x-coordinate, the program will not divide anything, only to let the points transfered to the rightVector again and again. 
 
-Don't say that input points with same x-coordinate are impossible. Someone who uses your library may oneday wants to solve the problem on 2d space only, and he specifies the x coordinate to 0 on purpose to delegate the problem to your code, only to find it trapped into endless loop. In addition, the quick-sort algorithm had the same problem to consider, which cultivates a imporved method called three-way quicksort. 
+Don't say that input points with same x-coordinate are impossible. Someone who uses your library may oneday wants to bruteForceSolve the problem on 2d space only, and he specifies the x coordinate to 0 on purpose to delegate the problem to your code, only to find it trapped into endless loop. In addition, the quick-sort algorithm had the same problem to consider, which cultivates a imporved method called three-way quicksort. 
 
 #### 2.1.5 Detail 3: Conquer：merge-sort first or closest point first?
 
